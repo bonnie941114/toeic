@@ -202,6 +202,11 @@ nav.days .ok{color:var(--green-ink);font-weight:700}
 .kwbtn{border:2px solid var(--yellow);background:var(--surface);border-radius:12px;padding:10px 12px;text-align:left;cursor:pointer;font-weight:700;box-shadow:0 2px 0 var(--shadow)}
 .kwbtn:hover{background:var(--yellow-soft)}
 
+
+.meaning{background:var(--surface);border-radius:10px;padding:8px 12px;font-size:.93rem;line-height:1.6}
+.meaning b{color:var(--green-ink);margin-right:4px}
+.meaning.m-opt{background:transparent;padding:0 0 0 2px;font-size:.88rem;color:var(--muted)}
+
 /* feedback panels */
 .panel{border-radius:16px;padding:14px;display:grid;gap:10px}
 .panel h4{font-size:.92rem;display:flex;align-items:center;gap:6px;font-weight:900}
@@ -959,13 +964,13 @@ function clipSrc(vk,text){ var k=vk+"/"+fnv(text); if(window.AUDIO_DATA && windo
 var player = (typeof Audio!=="undefined") ? new Audio() : null;
 var playToken = 0;
 function stopAll(){ playToken++; if(player){ try{ player.pause(); }catch(e){} } if(SP.ok) window.speechSynthesis.cancel(); }
-function speakOne(text, dv, cb, tok){
+function speakOne(text, dv, cb, tok, rate){
   if(!SP.ok){ cb(); return; }
   var parts=splitText(text), syn=window.speechSynthesis;
   parts.forEach(function(p,i){
     var u=new SpeechSynthesisUtterance(p);
     if(dv){ u.voice=dv; u.lang=dv.lang; } else u.lang="en-US";
-    u.rate=pref.rate||0.9;
+    u.rate=rate||pref.rate||0.9;
     if(i===parts.length-1){ u.onend=function(){ if(tok===playToken) cb(); }; u.onerror=u.onend; }
     syn.speak(u);
   });
@@ -985,20 +990,21 @@ function playQueue(items, done, rate){
     if(it.src && player){
       player.src=it.src; player.defaultPlaybackRate=player.playbackRate=rate||pref.rate||0.9;
       player.onended=go;
-      player.onerror=function(){ speakOne(it.text,it.dv,go,tok); };
+      player.onerror=function(){ speakOne(it.text,it.dv,go,tok,rate); };
       var pr=player.play(); if(pr && pr.catch) pr.catch(function(){ toast("請再按一次播放鍵。"); });
-    } else speakOne(it.text,it.dv,go,tok);
+    } else speakOne(it.text,it.dv,go,tok,rate);
   }
   next();
 }
 function gen(text,vk){ return {src:clipSrc(vk||"us_a",text), text:text}; }
-function speak(text,vk){ playQueue([gen(text,vk)]); }
+function speak(text,vk,rate){ playQueue([gen(text,vk)],null,rate); }
+function exRate(){ return pref.exRate||0.75; }
 function stopSpeak(){ stopAll(); }
 function speakSeq(items, done){ playQueue(items.map(function(it){ var g=gen(it.text,it.vk); g.onstart=it.onstart; return g; }), done); }
 function sayBtn(text,label,vk){
   var b=el("button","say",'🔊'+(label?' <span>'+label+'</span>':'')); b.type="button";
   b.setAttribute("aria-label","念出來："+text);
-  b.addEventListener("click",function(e){ e.stopPropagation(); speak(text,vk); });
+  b.addEventListener("click",function(e){ e.stopPropagation(); speak(text,vk,exRate()); });
   return b;
 }
 /* accent plan: recorded US + UK, plus device AU / CA if this device has them */
@@ -1033,6 +1039,17 @@ function accentLabel(q){
 function fullText(q){
   return q.type==="blank" ? stemText(q).replace("______",q.opts[q.ans]) : (q.type==="main"||q.type==="para") ? stemText(q) : (q.type==="trans" ? (q.full||q.a.t+" "+q.opts[q.ans]+", "+q.b.t) : "");
 }
+var MEAN = {"Please submit your expense report to the accounting department by Friday": "請在星期五前把你的費用報告交給會計部。", "All department managers are expected to attend the meeting on Thursday.": "所有部門經理都應該出席星期四的會議。", "Ms. Chen will take the minutes during the meeting and send them to everyone afterward.": "陳小姐會在會議中做紀錄，會後再寄給大家。", "The manager briefly explained the new budget at the meeting.": "經理在會議上簡短說明了新的預算。", "All staff must receive approval from their supervisor before working overtime.": "所有員工加班前都必須先得到主管的批准。", "The revised proposal will be sent to all team members tomorrow.": "修改後的提案明天會寄給所有組員。", "The memo about the new parking rules, which was written by the facilities manager, was distributed to all employees on Monday.": "關於新停車規定的備忘錄由設施經理撰寫，已在星期一發給全體員工。", "Employees who attend the training session will receive a certificate.": "參加訓練課程的員工會拿到一張證書。", "The meeting has been postponed until next Tuesday.": "會議已延到下星期二。", "It is ideal for printing large documents.": "它很適合用來印大量的文件。", "It is ideal for printing large documents. However, please do not use it for personal documents.": "它很適合用來印大量的文件。不過，請不要拿它印私人文件。", "please contact me at extension 245.": "請打分機 245 聯絡我。", "Staff Meeting Rescheduled": "員工會議改期", "The agenda will be distributed by e-mail on Thursday.": "議程會在星期四用電子郵件發出。", "Employees who cannot attend should inform their supervisor in advance.": "不能出席的員工應該事先告知主管。", "When does the meeting start?": "會議什麼時候開始？", "In Conference Room B.": "在 B 會議室。", "At ten o'clock.": "十點。", "Yes, I attended it.": "是的，我有參加。", "Who's taking the minutes today?": "今天誰負責做會議紀錄？", "About thirty minutes.": "大約三十分鐘。", "Mr. Park is.": "朴先生。", "It's on the agenda.": "那在議程上。", "Where should I submit my expense report?": "我的費用報告要交到哪裡？", "To the accounting department.": "交給會計部。", "Last Tuesday.": "上星期二。", "It was expensive.": "那很貴。", "Why was the meeting postponed?": "會議為什麼延期？", "Because the manager is sick.": "因為經理生病了。", "Next Monday at nine.": "下星期一九點。", "In the main office.": "在總辦公室。", "Would you like me to distribute the handouts?": "要我幫忙發講義嗎？", "Thanks, that would be helpful.": "謝謝，那會很有幫助。", "A large distribution center.": "一個大型物流中心。", "I like them too.": "我也喜歡它們。", "Has the budget been approved yet?": "預算已經核准了嗎？", "The board will decide tomorrow.": "董事會明天才會決定。", "It's a budget hotel.": "那是一間平價旅館。", "Yes, I proved it.": "是的，我證明了。", "Attention, all staff. The elevators in the north building will be closed for repairs on Wednesday morning. Please use the stairs or the elevators in the south building. We apologize for the inconvenience.": "各位同仁請注意。北棟的電梯星期三早上因維修暫停使用，請改走樓梯或搭南棟的電梯。造成不便，敬請見諒。", "The company plans to hire five new sales representatives next month.": "公司打算下個月僱用五位新的業務代表。", "Ms. Ito was promoted to regional manager after only two years with the firm.": "伊藤小姐進公司才兩年，就升上了區域經理。", "Please attach your résumé when you apply for the position online.": "在線上應徵這個職位時，請附上你的履歷。", "The list of job openings is updated every Monday.": "職缺清單每星期一更新。", "Each of the applicants has a short interview with the manager.": "每一位應徵者都會和經理進行簡短的面試。", "The new employees in the marketing department will attend a training session next week.": "行銷部的新進員工下星期會參加一場訓練課程。", "The applicant who was interviewed yesterday afternoon has accepted our job offer.": "昨天下午面試的那位應徵者已經接受了我們的錄取通知。", "One of the managers at the Tokyo office is retiring next month.": "東京辦公室的其中一位經理下個月要退休了。", "Mr. Lopez has resigned from his position.": "羅培茲先生已經辭去他的職務。", "Ms. Wu has ten years of experience in finance.": "吳小姐有十年的財務工作經驗。", "Before coming to our company, she worked at a large bank in Singapore.": "來我們公司之前，她在新加坡的一家大型銀行工作。", "Her office, along with the offices of her two assistants, is on the third floor.": "她的辦公室和兩位助理的辦公室都在三樓。", "Sales Assistant Wanted": "徵業務助理", "Applicants should have at least one year of sales experience and good computer skills.": "應徵者應具備至少一年的業務經驗和良好的電腦能力。", "Only qualified candidates will be contacted for an interview.": "只有符合資格的人選會接到面試通知。", "How many people applied for the job?": "有多少人應徵這份工作？", "About forty.": "大約四十個人。", "By e-mail.": "用電子郵件。", "Yes, it's a good job.": "是的，那是份好工作。", "Which candidate did you hire?": "你僱用了哪一位人選？", "The one with sales experience.": "有業務經驗的那一位。", "Higher than last year.": "比去年高。", "At nine tomorrow.": "明天九點。", "Would you prefer a morning or an afternoon interview?": "你比較想要上午還是下午面試？", "The afternoon works better for me.": "下午對我比較方便。", "Yes, I would.": "是的，我想要。", "It was a good interview.": "那是一場不錯的面試。", "Why don't we post the job ad online?": "我們何不把徵才廣告貼到網路上？", "That's a great idea.": "好主意。", "Because it was late.": "因為太晚了。", "At the post office.": "在郵局。", "Hello, this is Maria from Human Resources. I'm calling to let you know that your job interview has been moved from Tuesday to Thursday at ten A.M. Please bring two copies of your résumé. If this time doesn't work for you, please call me back.": "您好，我是人資部的瑪莉亞。打來是要通知您，您的面試從星期二改到星期四上午十點。請帶兩份履歷。如果這個時間不方便，請回電給我。", "Didn't you send the job offer yesterday?": "你昨天不是已經寄出錄取通知了嗎？", "No, I'll send it this afternoon.": "還沒，我今天下午會寄。", "A special offer on shoes.": "鞋子的特價優惠。", "Yes, they did.": "是的，他們做了。", "The new manager starts on Monday.": "新經理星期一開始上班。", "I'm looking forward to meeting her.": "我很期待見到她。", "He managed it very well.": "他處理得很好。", "A new management course.": "一門新的管理課程。", "All applicants must submit their résumés through the company website.": "所有應徵者都必須透過公司網站提交履歷。", "More than 200 people are expected to attend the product launch next week.": "預計會有超過兩百人出席下星期的產品發表會。", "Please read the minutes that were taken during last week's meeting.": "請閱讀上星期會議的會議紀錄。", "The new assistant quickly answered all of the customer's questions.": "新助理很快就回答了客戶的所有問題。", "Visitors must show proper identification at the front desk.": "訪客必須在櫃台出示有效的身分證明。", "The final decision on the project will be announced on Monday.": "這個案子的最終決定會在星期一公布。", "The report on last year's sales, which was prepared by Ms. Kim, was sent to the board this morning.": "去年的銷售報告由金小姐準備，今天早上已經送交董事會。", "Customers who sign up before Friday will get a free gift.": "星期五前註冊的客人會得到一份免費贈品。", "The training session has been called off.": "訓練課程已經取消了。", "The new version is simple to use.": "新版本很容易使用。", "The new version is simple to use. However, some reports may look different at first.": "新版本很容易使用。不過，有些報表一開始看起來可能會不太一樣。", "please send me an e-mail.": "請寄電子郵件給我。", "Office Closed for Cleaning": "辦公室因清潔暫停開放", "All employees should take their personal items home by Friday evening.": "所有員工應在星期五晚上前把個人物品帶回家。", "Staff who need to work on Saturday may use the meeting rooms on the second floor.": "星期六需要上班的員工可以使用二樓的會議室。", "When is the report due?": "報告什麼時候要交？", "By Friday afternoon.": "星期五下午之前。", "On the top shelf.": "在最上層的架子上。", "Yes, it's very long.": "是的，它很長。", "Who is in charge of the new project?": "誰負責這個新案子？", "Ms. Lee is.": "李小姐。", "There's no charge for delivery.": "運送不收費。", "It's a big project.": "那是個大案子。", "Where is the new photocopier?": "新的影印機在哪裡？", "On the second floor.": "在二樓。", "Ten copies, please.": "請印十份。", "It was installed yesterday.": "它是昨天裝好的。", "Why is the office closed today?": "辦公室今天為什麼關閉？", "For carpet cleaning.": "為了清洗地毯。", "It closes at six.": "六點關門。", "Please close the door.": "請關門。", "Could you send me the agenda?": "可以把議程寄給我嗎？", "Sure, I'll e-mail it now.": "沒問題，我現在就寄電子郵件給你。", "The agency is downtown.": "那家代理商在市中心。", "I sent a letter.": "我寄了一封信。", "Is the conference room available this afternoon?": "會議室今天下午有空嗎？", "Let me check the schedule.": "我查一下行程表。", "Five hundred people attended.": "有五百人出席。", "It's a comfortable room.": "那是個舒適的房間。", "Good morning, everyone. Our weekly team meeting will start thirty minutes late today because the manager's flight was delayed. Please use the extra time to finish your sales reports.": "大家早安。因為經理的班機延誤，今天的每週團隊會議會晚三十分鐘開始。請利用這段多出來的時間完成你們的銷售報告。", "We need to hire more staff for the busy holiday season.": "我們需要為忙碌的假期旺季多僱一些員工。", "After five years in sales, Mr. Ford was promoted to department head.": "在業務部待了五年後，福特先生升上了部門主管。", "Applicants must send a résumé and a cover letter by Friday.": "應徵者必須在星期五前寄出履歷和求職信。", "How long is the training program?": "訓練課程有多長？", "About two weeks.": "大約兩個星期。", "Yes, it was very long.": "是的，它非常長。", "Which department will the new employee work in?": "新員工會在哪個部門工作？", "Probably marketing.": "應該是行銷部。", "She's working very hard.": "她工作非常努力。", "A new employer.": "一位新雇主。", "The results of the employee survey have been sent to all managers.": "員工問卷的結果已經寄給所有經理了。", "Every new employee needs to complete a safety course.": "每位新進員工都需要完成一門安全課程。", "The applicants for the sales position had their interviews yesterday.": "應徵業務職位的人昨天已經面試了。", "The manager who reviewed the applications has chosen three candidates.": "審閱應徵資料的經理已經選出三位人選。", "The quality of the applications this year is very high.": "今年應徵資料的品質非常好。", "Ms. Grant will retire at the end of the year.": "格蘭特小姐將在年底退休。", "Should we hold the interview in person or online?": "面試我們要當面進行還是線上進行？", "Online would be easier.": "線上會比較方便。", "Yes, we should.": "是的，我們應該。", "He's a nice person.": "他人很好。", "Why don't you apply for the manager position?": "你何不應徵經理這個職位？", "Maybe I will.": "也許我會。", "Because he's the manager.": "因為他是經理。", "The application is on the desk.": "申請表在桌上。", "Each intern has a mentor from our team.": "每位實習生都有一位來自我們團隊的指導員。", "On their first day, the interns will attend an orientation.": "實習生第一天會參加新人說明會。", "The schedule, together with the list of mentors, has been posted on the bulletin board.": "時間表和指導員名單都已經貼在公告欄上了。", "Good afternoon, everyone. Before we finish today's training, please fill out the short survey on your desk. Your answers will help us improve future training sessions. Please leave the survey with me at the door.": "大家午安。今天的訓練結束前，請填寫桌上的簡短問卷。你們的回答能幫助我們改善之後的訓練課程。離開時請把問卷交給門口的我。", "Employee of the Month": "本月最佳員工", "Mr. Kim answered more than 500 customer calls last month.": "金先生上個月接了超過五百通客戶電話。", "He will receive a gift card and a reserved parking space for October.": "他會得到一張禮物卡，還有十月份的專屬停車位。", "Haven't the interview results been announced?": "面試結果還沒公布嗎？", "Not yet, maybe tomorrow.": "還沒，也許明天。", "The interview room is ready.": "面試室準備好了。", "They're very nice people.": "他們人都很好。", "I can't find the list of applicants.": "我找不到應徵者名單。", "It's on my desk.": "在我桌上。", "Twenty-five applicants.": "二十五位應徵者。", "He applied last week.": "他上星期應徵了。"};
+function zh(t){ return MEAN[t]||""; }
+function meaningEl(t,label){ var m=zh(t); return m ? el("div","meaning",(label?"<b>"+label+"</b>":"")+esc(m)) : null; }
+function locateText(q){ return (q.locate||[]).map(function(c){ return typeof c==="string"?c:c.t; }).join(" "); }
+function meaningTexts(q){
+  if(q.type==="listen") return [q.say].concat(q.opts);
+  if(q.type==="talk") return [q.say];
+  if(q.type==="p7") return [locateText(q)];
+  var f=fullText(q); return f?[f]:[];
+}
+window.__txList = function(){ var r=[], seen={}; Q.concat(TWINS).forEach(function(q){ meaningTexts(q).forEach(function(t){ if(t && !seen[t]){ seen[t]=1; r.push(q.id+"\t"+t); } }); }); return r; };
 window.__clips = function(){
   var out=[], seen={};
   function add(vk,t){ var k=vk+"/"+fnv(t); if(!seen[k]){ seen[k]=1; out.push({k:k,vk:vk,text:t}); } }
@@ -1088,8 +1105,17 @@ function renderVoice(){
   main.appendChild(el("div","dayhead",'<div class="badge" style="background:var(--blue)">🔊</div><div><h2>聲音設定</h2><p>美國和英國口音是預先錄好的，每台裝置聽到的都一樣。</p></div>'));
   var box=el("div","dialog"); main.appendChild(box);
   box.appendChild(el("div","note","沒有聲音嗎？① iPhone 請把側邊的靜音開關打開成有聲 ② 把音量調大或戴耳機 ③ 從 LINE 打開的話，請按右上角選「用瀏覽器開啟」。"));
-  box.appendChild(el("b","","語速"));
+  box.appendChild(el("b","","做題時的語速"));
   box.appendChild(rateChips());
+  box.appendChild(el("b","","解說和單字卡的語速（🔊 按鈕）"));
+  var ex=el("span","rates");
+  [0.6,0.7,0.75,0.85].forEach(function(r){
+    var b=el("button","chip"+(exRate()===r?" on":""),r+"x"); b.type="button";
+    b.setAttribute("aria-pressed",exRate()===r?"true":"false");
+    b.addEventListener("click",function(){ pref.exRate=r; savePref(); render(); speak(Q.filter(function(q){ return q.type==="blank"; })[0] ? fullText(Q.filter(function(q){ return q.type==="blank"; })[0]) : "",null,r); });
+    ex.appendChild(b);
+  });
+  box.appendChild(ex);
   var P=accentPlan();
   var extra=["澳洲","加拿大"].map(function(n){ return n+(P.dev[n]?" ✔":" ✕"); }).join("　");
   box.appendChild(el("b","","口音"));
@@ -1621,10 +1647,10 @@ function explain(q,a,fb){
   /* 2. tile breakdown (green) */
   var why=el("div","panel why",'<h4>🔍 字卡拆解：為什麼是這個答案</h4>');
   var full = fullText(q);
-  if(full){ var sr=el("div","row"); sr.appendChild(sayBtn(full,"聽整句")); why.appendChild(sr); }
+  if(full){ var sr=el("div","row"); sr.appendChild(sayBtn(full,"聽整句（慢速）")); why.appendChild(sr); var fm=meaningEl(full,"這句的意思："); if(fm) why.appendChild(fm); }
   if(q.type==="listen"||q.type==="talk"){
     why.appendChild(el("div","sub",q.type==="talk"?"廣播內容：":"題目念的是："));
-    var tr0=el("div","row"); tr0.appendChild(sayBtn(q.say,"再聽一次",q.type==="talk"?"us_a":"us_q")); tr0.appendChild(el("span","en",esc(q.say))); why.appendChild(tr0);
+    var tr0=el("div","row"); tr0.appendChild(sayBtn(q.say,"慢速再聽",q.type==="talk"?"us_a":"us_q")); tr0.appendChild(el("span","en",esc(q.say))); why.appendChild(tr0); var tm=meaningEl(q.say,"意思："); if(tm) why.appendChild(tm);
     why.appendChild(el("div","sub",q.type==="talk"?"關鍵句拆成字卡：":"拆成字卡，先抓第一張："));
     why.appendChild(el("div","",rowHTML(q.seg,{roles:true,clues:true})));
     why.appendChild(el("div","sub","每個選項："));
@@ -1632,7 +1658,7 @@ function explain(q,a,fb){
       var r=el("div","tryrow"); var line=el("div","row");
       if(q.type==="listen") line.appendChild(sayBtn(L[k]+". "+o,null,"us_a"));
       line.appendChild(el("span","en",(k===q.ans?'✔ ':'✕ ')+L[k]+'. '+esc(o)));
-      r.appendChild(line);
+      r.appendChild(line); var om=meaningEl(o,""); if(om){ om.className+=" m-opt"; r.appendChild(om); }
       r.appendChild(el("div","because",k===q.ans?'<b class="ok-b">✔</b><span>這是正確的回應。</span>':'<b>✕</b><span>'+esc(q.why[k])+'</span>'));
       why.appendChild(r);
     });
@@ -1671,6 +1697,7 @@ function explain(q,a,fb){
     var src = q.locate || q.orig;
     why.appendChild(el("div","sub",q.locate?"文章裡的這一句：":"原句："));
     why.appendChild(el("div","",rowHTML(src,{})));
+    if(q.locate){ var lm=meaningEl(locateText(q),"這句的意思："); if(lm) why.appendChild(lm); }
     why.appendChild(el("div","sub","正確選項（同樣號碼＝同一個意思）："));
     why.appendChild(el("div","",rowHTML(q.alt.map(function(c){ return typeof c==="string"?c:{t:c.t,pair:c.pair,core:1}; }),{})));
     why.appendChild(el("div","sub","其他選項錯在哪："));
