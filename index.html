@@ -190,6 +190,18 @@ nav.days .ok{color:var(--green-ink);font-weight:700}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom, 0px));background:var(--ink);color:var(--bg);border-radius:12px;padding:10px 16px;font-size:.9rem;max-width:calc(100% - 32px);z-index:5}
 .ok-b{color:var(--red-ink)}
 
+
+.weeks{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap}
+.wk{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 14px;font-weight:700;cursor:pointer;box-shadow:0 2px 0 var(--shadow)}
+.wk.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.accent{margin-top:-4px}
+
+
+.kwopts{display:grid;gap:8px}
+@media (min-width:560px){.kwopts{grid-template-columns:1fr 1fr}}
+.kwbtn{border:2px solid var(--yellow);background:var(--surface);border-radius:12px;padding:10px 12px;text-align:left;cursor:pointer;font-weight:700;box-shadow:0 2px 0 var(--shadow)}
+.kwbtn:hover{background:var(--yellow-soft)}
+
 /* feedback panels */
 .panel{border-radius:16px;padding:14px;display:grid;gap:10px}
 .panel h4{font-size:.92rem;display:flex;align-items:center;gap:6px;font-weight:900}
@@ -263,7 +275,7 @@ textarea{width:100%;box-sizing:border-box;min-height:90px;border:1.5px solid var
     <div class="brand">
       <div class="logo" aria-hidden="true"><i style="background:var(--blue)"></i><i style="background:var(--yellow)"></i><i style="background:var(--green)"></i><i style="background:var(--red)"></i></div>
       <div>
-        <div class="eyebrow">第 1 週・詞性判斷 × 辦公室與會議</div>
+        <div class="eyebrow" id="eyebrow">第 1 週・詞性判斷 × 辦公室與會議</div>
         <h1>多益每日三題</h1>
       </div>
     </div>
@@ -280,6 +292,7 @@ textarea{width:100%;box-sizing:border-box;min-height:90px;border:1.5px solid var
     <span class="lg-r">紅＝正解與核心</span>
   </div>
   <div class="linebar" id="linebar" hidden>你正在 LINE 裡開啟，聲音可能不穩定。建議按右上角「⋯」選「用瀏覽器開啟」。</div>
+  <div class="weeks" id="weeks" role="group" aria-label="選擇週次"></div>
   <nav class="days" id="days" aria-label="選擇星期"></nav>
   <div class="toast" id="toast" role="status" hidden></div>
   <main id="main"></main>
@@ -652,7 +665,7 @@ var LISTEN = [
   why:{1:"重複 budget，但 budget hotel 是「平價旅館」，同字陷阱。",2:"proved 和 approved 發音很像，是音近陷阱。"},
   rule:[{t:"Yes／No 問句",core:1},"→",{t:"可以不說 Yes／No",kw:1}],ruleNote:"間接回答：用「明天才決定」表示「還沒」",
   more:'Part 2 的正解常常不直接說 Yes 或 No，而是拐個彎回答。'},
- {id:"thu4",hint:"題目問聽眾被要求做什麼，抓 Please 後面那句。",day:"thu",cat:"lis-talk",tag:"聽力 Part 4",type:"talk",
+ {id:"thu4",kw:"要聽眾做的事",keySay:"Please use the stairs or the elevators in the south building.",hint:"題目問聽眾被要求做什麼，抓 Please 後面那句。",day:"thu",cat:"lis-talk",tag:"聽力 Part 4",type:"talk",
   say:"Attention, all staff. The elevators in the north building will be closed for repairs on Wednesday morning. Please use the stairs or the elevators in the south building. We apologize for the inconvenience.",
   ask:"What are listeners asked to do on Wednesday morning?",
   opts:["Use the stairs or other elevators","Work from home","Repair the elevators","Move to the north building"],ans:0,
@@ -692,7 +705,7 @@ var LISTEN_TWINS = [
   seg:[{t:"Is",r:"是非問句",clue:1},{t:"the conference room",r:"會議室"},{t:"available",r:"有空"},{t:"this afternoon?",r:"時間"}],
   why:{1:"跟會議有關，但沒有回答會議室有沒有空。",2:"重複 room，但沒有回答有沒有空。"},
   rule:[{t:"Yes／No 問句",core:1},"→",{t:"「我查一下」也是好答案",kw:1}],ruleNote:"間接回答：Let me check…、I'm not sure…",more:'available＝有空、可以使用。'},
- {id:"thu4-t",hint:"問原因，就抓 because 後面。",cat:"lis-talk",tag:"聽力 Part 4",type:"talk",
+ {id:"thu4-t",kw:"原因（為什麼發生）",keySay:"Our weekly team meeting will start thirty minutes late today because the manager's flight was delayed.",hint:"問原因，就抓 because 後面。",cat:"lis-talk",tag:"聽力 Part 4",type:"talk",
   say:"Good morning, everyone. Our weekly team meeting will start thirty minutes late today because the manager's flight was delayed. Please use the extra time to finish your sales reports.",
   ask:"Why will the meeting start late?",
   opts:["The manager's flight was delayed.","The sales reports are not finished.","The room is being cleaned.","The meeting time was changed last week."],ans:0,
@@ -740,31 +753,23 @@ function splitText(t){
   return out;
 }
 /* items: [{text, alt:bool, onstart:fn}] — must be called from a tap */
-function speakSeq(items, done){
+function speakSeqDevice(items, done){
   if(!SP.ok){ toast("這個瀏覽器不支援語音，請改用 Safari 或 Chrome。"); return; }
   var syn=window.speechSynthesis; syn.cancel();
   loadVoices();
-  if(!SP.voices.length && !SP.warned){ SP.warned=true; toast("這台裝置找不到英文語音，會用預設聲音念，發音可能不準。"); }
+  
   var queue=[];
-  items.forEach(function(it){ splitText(it.text).forEach(function(chunk,ci){ queue.push({text:chunk, alt:it.alt, onstart: ci===0?it.onstart:null}); }); });
+  items.forEach(function(it){ splitText(it.text).forEach(function(chunk,ci){ queue.push({text:chunk, alt:it.alt, voice:it.voice, onstart: ci===0?it.onstart:null}); }); });
   var m=mainVoice(), a=altVoice();
   queue.forEach(function(it,i){
     var u=new SpeechSynthesisUtterance(it.text);
-    var v = it.alt ? a : m;
+    var v = it.voice || (it.alt ? a : m);
     if(v){ u.voice=v; u.lang=v.lang; } else u.lang="en-US";
     u.rate = pref.rate || 0.9;
     if(it.onstart) u.onstart = it.onstart;
     if(i===queue.length-1 && done) u.onend = done;
     syn.speak(u);
   });
-}
-function speak(text){ speakSeq([{text:text}]); }
-function stopSpeak(){ if(SP.ok) window.speechSynthesis.cancel(); }
-function sayBtn(text,label){
-  var b=el("button","say",'🔊'+(label?' <span>'+label+'</span>':'')); b.type="button";
-  b.setAttribute("aria-label","念出來："+text);
-  b.addEventListener("click",function(e){ e.stopPropagation(); speak(text); });
-  return b;
 }
 var toastTimer=null;
 function toast(msg){
@@ -830,7 +835,7 @@ var main=document.getElementById("main"), daysNav=document.getElementById("days"
 var current=["sun","mon","tue","wed","thu","fri","sat"][new Date().getDay()];
 var view="day";
 function el(tag,cls,html){ var e=document.createElement(tag); if(cls) e.className=cls; if(html!=null) e.innerHTML=html; return e; }
-function qsFor(key){ return Q.filter(function(q){ return q.day===key; }); }
+function qsFor(key){ return Q.filter(function(q){ return q.day===key && (q.wk||1)===WEEK; }); }
 function isDone(id){ var a=state.answers[id]; return !!(a&&a.done); }
 
 function renderNav(){
@@ -845,6 +850,7 @@ function renderNav(){
 }
 
 function render(){
+  renderWeeks();
   renderNav();
   document.getElementById("book-count").textContent=openBook().length;
   main.innerHTML="";
@@ -854,15 +860,15 @@ function render(){
   var d=DAYS.filter(function(x){ return x.key===current; })[0];
   var qs = current==="sat" ? satQuestions() : qsFor(current);
   var prog = qs.length ? '<div class="progress" aria-label="今日進度">'+qs.map(function(q){ var a=state.answers[q.key||q.id]; return '<i class="'+(a&&a.done?"on":(a&&a.tries?"half":""))+'"></i>'; }).join("")+'</div>' : "";
-  main.appendChild(el("div","dayhead",'<div class="badge" style="background:'+d.c+'">'+d.d+'</div><div><h2>週'+d.d+'｜'+d.title+'</h2><p>'+d.sub+'</p>'+prog+'</div>'));
+  main.appendChild(el("div","dayhead",'<div class="badge" style="background:'+d.c+'">'+d.d+'</div><div><h2>週'+d.d+'｜'+d.title+'</h2><p>'+((WEEKS[WEEK].sub||{})[d.key]||d.sub)+'</p>'+prog+'</div>'));
   if(current==="sun") return rest("今天休息","明天見！");
   if(current==="sat" && !qs.length) return rest("這週沒有錯題，今天休息","平日答錯或按「我是猜的」的題目，週六會換成同考點的新題。");
-  if(PASSAGES[current]) main.appendChild(el("div","passage",PASSAGES[current]));
+  if(current!=="sat" && PASSAGES[pk(current)]) main.appendChild(el("div","passage",PASSAGES[pk(current)]));
   if(current==="sat") main.appendChild(el("p","note","這週有 "+qs.length+" 題要複習。每一題錯題都換成一題「孿生題」：考同一個重點，但句子和情境不一樣。答對了，那筆錯題就會從錯題本移走。"));
   var list=el("div","qlist"); main.appendChild(list);
   qs.forEach(function(q,i){ list.appendChild(renderQ(q,i+1)); });
   var readQs=qs.filter(function(q){ return q.passage && q.type!=="listen" && q.type!=="talk"; });
-  if(current!=="sat" && READBACK[current] && readQs.length && readQs.every(function(q){ return isDone(q.key||q.id); })){ var rb=readbackPanel(current); if(rb) main.appendChild(rb); }
+  if(current!=="sat" && READBACK[pk(current)] && readQs.length && readQs.every(function(q){ return isDone(q.key||q.id); })){ var rb=readbackPanel(pk(current)); if(rb) main.appendChild(rb); }
   if(qs.every(function(q){ return isDone(q.key||q.id); })) renderDone(qs);
 }
 
@@ -890,7 +896,7 @@ function renderWordCards(){
   main.appendChild(el("h3","section-title","本週單字卡"));
   main.appendChild(el("p","note","翻面之前，先自己說說看中文意思。看過不等於記住。"));
   var g=el("div","cards"); main.appendChild(g);
-  WORDS.forEach(function(w){
+  (WEEKS[WEEK].words||WORDS).forEach(function(w){
     var front='<span class="w">'+w[0]+'</span><span class="c">'+w[1]+'</span>', back='<span class="zh">'+w[2]+'</span><span class="c">'+w[1]+'</span>';
     var wrap=el("div","wwrap");
     var c=el("button","wcard",front); c.type="button"; c.setAttribute("aria-pressed","false");
@@ -935,38 +941,525 @@ function rateChips(){
   });
   return w;
 }
+var ACCENT_ORDER=["美國","英國","澳洲","加拿大"];
+function accentGroups(){
+  loadVoices();
+  var map={}, names=[];
+  SP.voices.forEach(function(v){ var n=accentName(v.lang); if(!map[n]){ map[n]=[]; names.push(n); } map[n].push(v); });
+  names.sort(function(a,b){ var ia=ACCENT_ORDER.indexOf(a), ib=ACCENT_ORDER.indexOf(b); return (ia<0?9:ia)-(ib<0?9:ib); });
+  return names.filter(function(n){ return ACCENT_ORDER.indexOf(n)>=0; }).map(function(n){ return {name:n, voices:map[n]}; });
+}
+function hashId(s){ var h=0; s=String(s); for(var i=0;i<s.length;i++){ h=(h*31+s.charCodeAt(i))|0; } return Math.abs(h); }
+/* ---------- recorded audio (US / UK) + device voices for AU / CA ---------- */
+var AUDIO_LIST = ["us_a/51fb83f9", "us_a/2804b5e6", "us_a/a5d680ac", "us_a/694184af", "us_a/ce7685ba", "us_a/83c3469c", "us_a/60209b62", "us_a/501e65f0", "us_a/57248893", "us_a/184dcde4", "us_a/6f56ec17", "us_a/37398966", "us_q/5a97d385", "gb_q/5a97d385", "us_a/5d4ec834", "gb_a/5d4ec834", "us_a/5e9887e5", "gb_a/5e9887e5", "us_a/770054da", "gb_a/770054da", "us_q/cb99fda9", "gb_q/cb99fda9", "us_a/7f4c4742", "gb_a/7f4c4742", "us_a/793411a0", "gb_a/793411a0", "us_a/299f5789", "gb_a/299f5789", "us_q/7b2bf895", "gb_q/7b2bf895", "us_a/0595f135", "gb_a/0595f135", "us_a/472573c6", "gb_a/472573c6", "us_a/f500ff15", "gb_a/f500ff15", "us_q/81f88675", "gb_q/81f88675", "us_a/a0f7df1a", "gb_a/a0f7df1a", "us_a/0fa2c109", "gb_a/0fa2c109", "us_a/fcb74647", "gb_a/fcb74647", "us_q/d7c10aa8", "gb_q/d7c10aa8", "us_a/59ebc68c", "gb_a/59ebc68c", "us_a/f9f87f68", "gb_a/f9f87f68", "us_a/40dff8e8", "gb_a/40dff8e8", "us_q/a9bee99b", "gb_q/a9bee99b", "us_a/7696e4ae", "gb_a/7696e4ae", "us_a/5ee2ea98", "gb_a/5ee2ea98", "us_a/a88699b5", "gb_a/a88699b5", "us_a/c28a8162", "gb_q/c28a8162", "us_a/0b5591b7", "gb_q/0b5591b7", "us_a/f954abe9", "us_a/5047f49e", "us_a/5d53be6b", "us_a/1cf0ef43", "us_a/a5c3d3f1", "us_a/d6c03d23", "us_a/1d8944d5", "us_a/2ea1437a", "us_a/d7ea23d8", "us_a/33ae9e54", "us_a/a5cbb479", "us_a/0599ef7d", "us_q/dcdcaf26", "gb_q/dcdcaf26", "us_a/12e35b8f", "gb_a/12e35b8f", "us_a/f5ec6ceb", "gb_a/f5ec6ceb", "us_a/fee4abc3", "gb_a/fee4abc3", "us_q/7b49806e", "gb_q/7b49806e", "us_a/964ec4d9", "gb_a/964ec4d9", "us_a/b82913a0", "gb_a/b82913a0", "us_a/d015f0cc", "gb_a/d015f0cc", "us_q/25bc8102", "gb_q/25bc8102", "us_a/d57a2a28", "gb_a/d57a2a28", "us_a/561417d6", "gb_a/561417d6", "us_a/6ca5cd57", "gb_a/6ca5cd57", "us_q/44a685de", "gb_q/44a685de", "us_a/f7e75154", "gb_a/f7e75154", "us_a/8debe169", "gb_a/8debe169", "us_a/c7ebf87e", "gb_a/c7ebf87e", "us_a/be42de27", "gb_q/be42de27", "us_a/626f2bc5", "gb_q/626f2bc5", "us_q/273d48d1", "gb_q/273d48d1", "us_a/534881a4", "gb_a/534881a4", "us_a/13eb2d02", "gb_a/13eb2d02", "us_a/cf5c4466", "gb_a/cf5c4466", "us_q/47c8c85d", "gb_q/47c8c85d", "us_a/a6cbbae6", "gb_a/a6cbbae6", "us_a/85d42b84", "gb_a/85d42b84", "us_a/a05d9329", "gb_a/a05d9329", "us_a/4173da5a", "us_a/3d3408a7", "us_a/75ff3b96", "us_a/ba0280c3", "us_a/1d729f5c", "us_a/c3105fa0", "us_a/e3770ce2", "us_a/fc405f25", "us_a/50f0ffb2", "us_a/013009c0", "us_a/29a79901", "us_a/90878857", "us_q/dff229f5", "gb_q/dff229f5", "us_a/b571b5dc", "gb_a/b571b5dc", "us_a/b175bc08", "gb_a/b175bc08", "us_a/191980a4", "gb_a/191980a4", "us_q/4dc80cf2", "gb_q/4dc80cf2", "us_a/d3186f98", "gb_a/d3186f98", "us_a/060c5021", "gb_a/060c5021", "us_a/047930f7", "gb_a/047930f7", "us_q/fc3fc9f0", "gb_q/fc3fc9f0", "us_a/e75c63e4", "gb_a/e75c63e4", "us_a/c6ca3585", "gb_a/c6ca3585", "us_a/0b81cbec", "gb_a/0b81cbec", "us_q/85fb21c6", "gb_q/85fb21c6", "us_a/33d9665b", "gb_a/33d9665b", "us_a/282aa472", "gb_a/282aa472", "us_a/39f8cab3", "gb_a/39f8cab3", "us_q/8a55a063", "gb_q/8a55a063", "us_a/5f782bf9", "gb_a/5f782bf9", "us_a/e1a27b25", "gb_a/e1a27b25", "us_a/3d194736", "gb_a/3d194736", "us_q/94158e71", "gb_q/94158e71", "us_a/26945e79", "gb_a/26945e79", "us_a/04c1d853", "gb_a/04c1d853", "us_a/b63921bb", "gb_a/b63921bb", "us_a/124abe88", "gb_q/124abe88", "us_a/d34a10f5", "gb_q/d34a10f5", "us_a/957dd48f", "us_a/08f658a2", "us_a/2a416f2c", "us_q/b38bb4fb", "gb_q/b38bb4fb", "us_a/0f108116", "gb_a/0f108116", "us_a/ccff4a86", "gb_a/ccff4a86", "us_a/4df23215", "gb_a/4df23215", "us_q/02225a40", "gb_q/02225a40", "us_a/1f3395c9", "gb_a/1f3395c9", "us_a/977b35fb", "gb_a/977b35fb", "us_a/58ec6634", "gb_a/58ec6634", "us_a/355b51b0", "us_a/c0dc5e4b", "us_a/444ec7f1", "us_a/95d93ea8", "us_a/4e851af3", "us_a/9416cb46", "us_q/8e31fda8", "gb_q/8e31fda8", "us_a/c244b93c", "gb_a/c244b93c", "us_a/f43fddb1", "gb_a/f43fddb1", "us_a/f26bcdea", "gb_a/f26bcdea", "us_q/55c460ff", "gb_q/55c460ff", "us_a/246719db", "gb_a/246719db", "us_a/270b7f14", "gb_a/270b7f14", "us_a/5d945052", "gb_a/5d945052", "us_a/99dd5583", "us_a/714be133", "us_a/4dad9f1f", "us_a/2418661a", "gb_q/2418661a", "us_a/7566a8d9", "gb_q/7566a8d9", "us_q/ca90c9ea", "gb_q/ca90c9ea", "us_a/121a3598", "gb_a/121a3598", "us_a/9608f547", "gb_a/9608f547", "us_a/021047fc", "gb_a/021047fc", "us_q/20be9d69", "gb_q/20be9d69", "us_a/9a16f861", "gb_a/9a16f861", "us_a/8c6daeea", "gb_a/8c6daeea", "us_a/7d494f90", "gb_a/7d494f90", "us_a/1708de0e", "us_a/339d1158", "us_a/016324ef", "us_a/94fdcd5a", "us_a/0ecabf99", "us_a/9f0728f7", "us_a/edee8cbe", "us_a/3c7ff2e9", "us_a/4b1326f6", "us_a/fce3a710", "us_a/11daeeee", "us_a/d4637b44", "us_a/dd60b161", "us_a/f0af8cde", "us_a/d70f9ca4", "us_a/bce06deb", "us_a/3a7acc0d", "us_a/df7bfe31", "us_a/431e4c09", "us_a/d0b8cb41", "us_a/7e0d2d5e", "us_a/c7f38617", "us_a/c35a4fe2", "us_a/ac0197fa", "us_a/3ea2863a", "us_a/d39a1a97", "us_a/e087152c", "us_a/5349ac93", "us_a/6b4d31e1", "us_a/b66290a1", "us_a/85b65e7d"];
+var AUDIO_OK = {}; AUDIO_LIST.forEach(function(k){ AUDIO_OK[k]=1; });
+function fnv(s){ var h=0x811c9dc5; s=String(s); for(var i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,0x01000193)>>>0; } return ("0000000"+h.toString(16)).slice(-8); }
+function clipSrc(vk,text){ var k=vk+"/"+fnv(text); if(window.AUDIO_DATA && window.AUDIO_DATA[k]) return window.AUDIO_DATA[k]; return AUDIO_OK[k] ? "pending" : null; }
+(function(){ try{ var sc=document.createElement("script"); sc.src="audio-bundle.js"; sc.async=true; (document.head||document.body).appendChild(sc); }catch(e){} })();
+var player = (typeof Audio!=="undefined") ? new Audio() : null;
+var playToken = 0;
+function stopAll(){ playToken++; if(player){ try{ player.pause(); }catch(e){} } if(SP.ok) window.speechSynthesis.cancel(); }
+function speakOne(text, dv, cb, tok){
+  if(!SP.ok){ cb(); return; }
+  var parts=splitText(text), syn=window.speechSynthesis;
+  parts.forEach(function(p,i){
+    var u=new SpeechSynthesisUtterance(p);
+    if(dv){ u.voice=dv; u.lang=dv.lang; } else u.lang="en-US";
+    u.rate=pref.rate||0.9;
+    if(i===parts.length-1){ u.onend=function(){ if(tok===playToken) cb(); }; u.onerror=u.onend; }
+    syn.speak(u);
+  });
+}
+/* items: [{src, text, dv, onstart, gap}] — call from a tap */
+function playQueue(items, done, rate){
+  if(items.some(function(x){ return x.src==="pending"; })){ toast("聲音還在載入中，請等幾秒再按一次。"); return; }
+  stopAll(); var tok=playToken, i=0;
+  var needTTS=items.some(function(x){ return !x.src; });
+  if(needTTS && SP.ok){ try{ var w=new SpeechSynthesisUtterance(" "); w.volume=0; window.speechSynthesis.speak(w); }catch(e){} }
+  function next(){
+    if(tok!==playToken) return;
+    if(i>=items.length){ if(done) done(); return; }
+    var it=items[i++];
+    if(it.onstart) it.onstart();
+    var go=function(){ if(tok!==playToken) return; setTimeout(next, it.gap!=null?it.gap:350); };
+    if(it.src && player){
+      player.src=it.src; player.defaultPlaybackRate=player.playbackRate=rate||pref.rate||0.9;
+      player.onended=go;
+      player.onerror=function(){ speakOne(it.text,it.dv,go,tok); };
+      var pr=player.play(); if(pr && pr.catch) pr.catch(function(){ toast("請再按一次播放鍵。"); });
+    } else speakOne(it.text,it.dv,go,tok);
+  }
+  next();
+}
+function gen(text,vk){ return {src:clipSrc(vk||"us_a",text), text:text}; }
+function speak(text,vk){ playQueue([gen(text,vk)]); }
+function stopSpeak(){ stopAll(); }
+function speakSeq(items, done){ playQueue(items.map(function(it){ var g=gen(it.text,it.vk); g.onstart=it.onstart; return g; }), done); }
+function sayBtn(text,label,vk){
+  var b=el("button","say",'🔊'+(label?' <span>'+label+'</span>':'')); b.type="button";
+  b.setAttribute("aria-label","念出來："+text);
+  b.addEventListener("click",function(e){ e.stopPropagation(); speak(text,vk); });
+  return b;
+}
+/* accent plan: recorded US + UK, plus device AU / CA if this device has them */
+var REC = {"美國":{q:"us_q",a:"us_a",talk:"us_a"}, "英國":{q:"gb_q",a:"gb_a",talk:"gb_q"}};
+function accentPlan(){
+  var list=["美國","英國"], dev={};
+  accentGroups().forEach(function(g){ if((g.name==="澳洲"||g.name==="加拿大")){ list.push(g.name); dev[g.name]=g.voices[0]; } });
+  return {list:list, dev:dev};
+}
+function pairFor(q){
+  var P=accentPlan(), n=hashId(q.id)%P.list.length;
+  var qa=P.list[n], aa=P.list[(n+1)%P.list.length];
+  return {qn:qa, an:aa, dev:P.dev};
+}
+function part(text, accent, role, P){
+  if(REC[accent]) return {src:clipSrc(REC[accent][role],text), text:text};
+  return {src:null, text:text, dv:P.dev[accent]};
+}
 function playItems(q){
-  if(q.type==="talk") return [{text:q.say}];
-  var it=[{text:q.say}];
-  q.opts.forEach(function(o,i){ it.push({text:L[i]+". "+o, alt:true}); });
+  var p=pairFor(q);
+  if(q.type==="talk") return [part(q.say,p.qn,"talk",p)];
+  var it=[part(q.say,p.qn,"q",p)];
+  q.opts.forEach(function(o,i){ it.push(part(L[i]+". "+o,p.an,"a",p)); });
   return it;
 }
+function keyItems(q){ var p=pairFor(q); return [part(q.keySay,p.qn,"talk",p)]; }
+function accentLabel(q){
+  var p=pairFor(q), tag=function(n){ return n+(REC[n]?"":"（手機內建聲音）"); };
+  return q.type==="talk" ? "這段廣播：" + tag(p.qn) + "口音" : "這題口音：問句 " + tag(p.qn) + "・回應 " + tag(p.an);
+}
+/* every clip the page can ask for — used at build time to record them */
+function fullText(q){
+  return q.type==="blank" ? stemText(q).replace("______",q.opts[q.ans]) : (q.type==="main"||q.type==="para") ? stemText(q) : (q.type==="trans" ? (q.full||q.a.t+" "+q.opts[q.ans]+", "+q.b.t) : "");
+}
+window.__clips = function(){
+  var out=[], seen={};
+  function add(vk,t){ var k=vk+"/"+fnv(t); if(!seen[k]){ seen[k]=1; out.push({k:k,vk:vk,text:t}); } }
+  Q.concat(TWINS).forEach(function(q){
+    if(q.type==="listen"){ add("us_q",q.say); add("gb_q",q.say); q.opts.forEach(function(o,i){ add("us_a",L[i]+". "+o); add("gb_a",L[i]+". "+o); }); }
+    else if(q.type==="talk"){ add("us_a",q.say); add("gb_q",q.say); add("us_a",q.keySay); add("gb_q",q.keySay); }
+    else { var f=fullText(q); if(f) add("us_a",f); }
+  });
+  Object.keys(READBACK).forEach(function(k){ READBACK[k].forEach(function(t){ add("us_a",t); }); });
+  Object.keys(WEEKS).forEach(function(k){ (WEEKS[k].words||[]).forEach(function(w){ add("us_a",w[0]+". "+w[1]); }); });
+  return out;
+};
+
+/* ---------- listening: wrong answer → find the key word → slow replay → answer again ---------- */
+var KW_LIS = {"lis-when":"When（問時間）","lis-who":"Who（問人）","lis-where":"Where（問地點）","lis-why":"Why（問原因）","lis-how":"How（問數量／多久）","lis-which":"Which（問哪一個）","lis-choice":"A or B（二選一）","lis-suggest":"建議（Why don't we…）","lis-offer":"提議或請求（Would you… / Could you…）","lis-indirect":"Yes／No 問句","lis-neg":"Yes／No 問句（否定問句）","lis-statement":"不是問句（陳述句）"};
+var KW_TALK = ["目的（為什麼說這段話）","原因（為什麼發生）","要聽眾做的事","時間或地點"];
+function kwChoices(q){
+  if(q.type==="talk") return KW_TALK.slice();
+  var right=KW_LIS[q.cat], pool=Object.keys(KW_LIS).map(function(k){ return KW_LIS[k]; }).filter(function(x){ return x!==right; });
+  var h=hashId(q.id), pick=[];
+  for(var i=0;pick.length<3;i++){ var c=pool[(h+i*5)%pool.length]; if(pick.indexOf(c)<0) pick.push(c); }
+  pick.splice(h%4,0,right);
+  return pick;
+}
+function kwRight(q){ return q.type==="talk" ? q.kw : KW_LIS[q.cat]; }
+function kwPanel(q,a){
+  var p=el("div","panel hint");
+  if(a.phase==="kw"){
+    p.appendChild(el("h4","",q.type==="talk"?"🎯 先想想：這題要你找什麼？":"🎯 先想想：問句的第一個關鍵字是什麼？"));
+    p.appendChild(el("div","small",q.type==="talk"?"看懂題目在問什麼，重聽時耳朵才知道要抓哪一句。":"Part 2 的答案類型，幾乎都由問句開頭決定。可以先按上面的播放鍵再聽一次。"));
+    var box=el("div","kwopts");
+    kwChoices(q).forEach(function(c){
+      var b=el("button","kwbtn",esc(c)); b.type="button";
+      b.addEventListener("click",function(){ a.kwPick=c; a.phase="kwdone"; save(); render(); });
+      box.appendChild(b);
+    });
+    p.appendChild(box);
+  } else {
+    var ok=a.kwPick===kwRight(q);
+    p.appendChild(el("h4","",ok?"✔ 抓對了！":"再看一次"));
+    p.appendChild(el("div","",ok?"這題的關鍵是：<b>"+esc(kwRight(q))+"</b>":"你選了「"+esc(a.kwPick||"")+"」，這題的關鍵其實是：<b>"+esc(kwRight(q))+"</b>"));
+    p.appendChild(el("div","hinttext",'💡 '+esc(q.hint)));
+    var row=el("div","row");
+    var slow=el("button","btn primary",q.type==="talk"?"▶ 慢速重聽關鍵句":"▶ 慢速重聽題目和選項"); slow.type="button";
+    slow.addEventListener("click",function(){ playQueue(q.type==="talk"?keyItems(q):playItems(q),null,0.8); });
+    row.appendChild(slow); p.appendChild(row);
+    p.appendChild(el("div","sub2","聽完之後，在上面再選一次答案。"));
+  }
+  return p;
+}
+
 function renderVoice(){
-  main.appendChild(el("div","dayhead",'<div class="badge" style="background:var(--blue)">🔊</div><div><h2>聲音設定</h2><p>聲音來自這台手機或電腦內建的語音，每台裝置能選的口音不一樣。</p></div>'));
+  main.appendChild(el("div","dayhead",'<div class="badge" style="background:var(--blue)">🔊</div><div><h2>聲音設定</h2><p>美國和英國口音是預先錄好的，每台裝置聽到的都一樣。</p></div>'));
   var box=el("div","dialog"); main.appendChild(box);
-  if(!SP.ok){ box.appendChild(el("p","","這個瀏覽器不支援語音。請改用 Safari（iPhone）或 Chrome（Android、電腦）開啟。")); return; }
-  loadVoices();
   box.appendChild(el("div","note","沒有聲音嗎？① iPhone 請把側邊的靜音開關打開成有聲 ② 把音量調大或戴耳機 ③ 從 LINE 打開的話，請按右上角選「用瀏覽器開啟」。"));
   box.appendChild(el("b","","語速"));
   box.appendChild(rateChips());
-  box.appendChild(el("b","","主要聲音（題目用這個聲音念，選項會換另一個聲音）"));
-  if(!SP.voices.length){ box.appendChild(el("p","small","這台裝置目前找不到英文語音。可以先按下面的「試聽」，有些手機要先發一次聲音才會載入清單；再不行就請換瀏覽器。")); }
-  var list=el("div","vlist"); box.appendChild(list);
-  var m=mainVoice();
-  SP.voices.forEach(function(v){
-    var r=el("label","vitem",'<input type="radio" name="voice"'+(m&&m.name===v.name?' checked':'')+'> <span><b>'+accentName(v.lang)+'</b>　'+esc(v.name)+' <span class="small">('+esc(v.lang)+')</span></span>');
-    r.querySelector("input").addEventListener("change",function(){ pref.voice=v.name; savePref(); speak("Hello. This is your TOEIC practice voice."); });
-    list.appendChild(r);
-  });
+  var P=accentPlan();
+  var extra=["澳洲","加拿大"].map(function(n){ return n+(P.dev[n]?" ✔":" ✕"); }).join("　");
+  box.appendChild(el("b","","口音"));
+  box.appendChild(el("p","small","預錄：美國 ✔　英國 ✔<br>這台裝置的內建聲音：" + extra + "<br>有 ✔ 的澳洲、加拿大口音，會輪流加進聽力題；沒有的就只聽美國和英國。"));
   var row=el("div","row");
-  var t=el("button","btn primary","▶ 試聽"); t.type="button";
-  t.addEventListener("click",function(){ speakSeq([{text:"When does the meeting start?"},{text:"At ten o'clock.",alt:true}],function(){ render(); }); });
-  row.appendChild(t); box.appendChild(row);
-  var acc={}; SP.voices.forEach(function(v){ acc[accentName(v.lang)]=1; });
-  box.appendChild(el("p","small","這台裝置找得到的口音："+(Object.keys(acc).join("、")||"無")+"。多益會出現美國、英國、加拿大、澳洲四種口音。"));
+  var demo = Q.filter(function(q){ return q.type==="listen"; })[0];
+  var t=el("button","btn primary","▶ 試聽美國＋英國"); t.type="button";
+  t.addEventListener("click",function(){ playQueue([gen(demo.say,"us_q"), gen("B. "+demo.opts[1],"gb_a")]); });
+  row.appendChild(t);
+  ["澳洲","加拿大"].forEach(function(n){ if(P.dev[n]){ var b=el("button","btn","▶ 試聽"+n); b.type="button"; b.addEventListener("click",function(){ playQueue([{src:null,text:demo.say,dv:P.dev[n]}]); }); row.appendChild(b); } });
+  box.appendChild(row);
 }
 
 
+/* ================= WEEK 2: 主詞與動詞、主詞動詞一致 × 人事與招聘 ================= */
+PASSAGES["w2-thu"]='<div class="meta"><span>To: All Staff</span><span>From: Human Resources</span><span>Subject: Welcome Our New Team Member</span></div>We are pleased to announce that Ms. Karen Wu has joined our accounting team. Ms. Wu <span class="blank">(1)</span> ten years of experience in finance. <span class="blank">(2)</span> coming to our company, she worked at a large bank in Singapore. Her office, along with the offices of her two assistants, <span class="blank">(3)</span> on the third floor.';
+PASSAGES["w2-fri"]='<h3>Sales Assistant Wanted</h3>Brightway Office Supplies is looking for a full-time sales assistant to join our team in Taipei. Applicants should have at least one year of sales experience and good computer skills. The position includes paid training and health insurance. To apply, send your résumé to jobs@brightway.com by October 31. Only qualified candidates will be contacted for an interview.';
+PASSAGES["w2-thu-t"]='<div class="meta"><span>To: Design Department</span><span>From: Office Manager</span><span>Subject: New Interns</span></div>Starting next week, three interns from Hilltop University will work in our design department. Each intern <span class="blank">(1)</span> a mentor from our team. <span class="blank">(2)</span> their first day, the interns will attend an orientation. The schedule, together with the list of mentors, <span class="blank">(3)</span> been posted on the bulletin board.';
+PASSAGES["w2-fri-t"]='<h3>Employee of the Month</h3>Congratulations to Daniel Kim from the customer service department, who has been named Employee of the Month for September. Mr. Kim answered more than 500 customer calls last month and received excellent feedback. He will receive a gift card and a reserved parking space for October. A short celebration will be held in the break room on Friday at 4 P.M.';
+
+READBACK["w2-thu"]=["We are pleased to announce that Ms. Karen Wu has joined our accounting team.","Ms. Wu has ten years of experience in finance.","Before coming to our company, she worked at a large bank in Singapore.","Her office, along with the offices of her two assistants, is on the third floor."];
+READBACK["w2-fri"]=["Sales Assistant Wanted.","Brightway Office Supplies is looking for a full-time sales assistant to join our team in Taipei.","Applicants should have at least one year of sales experience and good computer skills.","The position includes paid training and health insurance.","To apply, send your résumé to jobs@brightway.com by October 31.","Only qualified candidates will be contacted for an interview."];
+
+var SV_RULE = '<div class="diagram"><div class="slots"><span class="slot">真正的主詞</span><span class="slot">（of… / along with… / who…）</span><span class="slot hole">動詞跟著主詞</span></div></div>';
+
+var W2 = [
+ /* ---- Monday: vocab ---- */
+ {id:"w2-mon1",wk:2,day:"mon",cat:"vocab",tag:"單字",type:"blank",
+  sent:[{t:"The company",r:"主詞"},{t:"plans to",join:1},{slot:1,r:"動詞"},{t:"five new sales representatives",r:"人（受詞）",clue:1},"next month."],
+  opts:["hire","retire","resign","apply"],ans:0,role:["僱用","退休","辭職","申請"],
+  hint:"空格後面直接接「五位新業務」，公司對這些人做什麼？",
+  why:{1:"retire 是自己退休，後面不能直接接人。",2:"resign 是自己辭職，要說 resign from a job。",3:"apply 要加 for，而且是應徵者做的事。"},
+  rule:[{t:"hire",core:1},"+",{t:"人",kw:1}],ruleNote:"hire＝僱用（＝employ）",
+  more:'hire（僱用）↔ fire（解僱）；比較 resign（辭職）、retire（退休）'},
+ {id:"w2-mon2",wk:2,day:"mon",cat:"vocab",tag:"單字",type:"blank",
+  sent:[{t:"Ms. Ito",r:"主詞"},{t:"was",join:1},{slot:1,r:"被…"},{t:"to regional manager",r:"升到哪裡",clue:1},"after only two years with the firm."],
+  opts:["promoted","applied","resigned","retired"],ans:0,role:["升職","申請","辭職","退休"],
+  hint:"was ___ to manager：被「升」到經理。",
+  why:{1:"apply 要加 for，也不會用 was applied to 經理。",2:"resign 是主動辭職，不會「被辭職到經理」。",3:"retire 是退休，不會「退休到經理」。"},
+  rule:[{t:"be promoted",core:1},"+",{t:"to＋職位",kw:1}],ruleNote:"be promoted to manager＝升為經理",
+  more:'promotion 也是「升職」，同時也有「促銷」的意思。'},
+ {id:"w2-mon3",wk:2,day:"mon",cat:"vocab",tag:"單字",type:"blank",
+  sent:[{t:"Please attach",r:"動詞",clue:1},{t:"your",join:1},{slot:1,r:"東西"},{t:"when you apply for the position online.",r:"時間"}],
+  opts:["résumé","candidate","position","personnel"],ans:0,role:["履歷","候選人","職位","人員"],
+  hint:"應徵時要「附上」的東西是什麼？",
+  why:{1:"candidate 是人，不能附在信裡。",2:"position 是職位，不能附上。",3:"personnel 是公司的全體人員或人事部。"},
+  rule:[{t:"attach / send",r:"動作"},"+",{t:"a résumé",core:1}],ruleNote:"résumé＝履歷",
+  more:'personnel（人員）和 personal（個人的）長得很像。'},
+ /* ---- Tuesday: subject–verb ---- */
+ {id:"w2-tue1",wk:2,day:"tue",cat:"sva",tag:"主詞動詞一致",type:"blank",
+  sent:[{t:"The list",r:"真正的主詞",clue:1},{t:"of job openings",r:"修飾"},{slot:1,r:"單數動詞"},"updated every Monday."],
+  opts:["is","are","have","were"],ans:0,role:["單數 be","複數 be","複數 have","複數過去"],
+  hint:"真正的主詞是 list 還是 openings？",
+  why:{1:"are 配複數，但主詞是 the list（單數）。",2:"have updated 是主動，名單是「被」更新。",3:"were 是複數，主詞 list 是單數。"},
+  rule:[{t:"The list",core:1,r:"單數"},"+",{t:"of …",r:"可拿掉"},"+",{t:"is",core:1}],ruleNote:"of 後面的名詞不是主詞",
+  more:SV_RULE},
+ {id:"w2-tue2",wk:2,day:"tue",cat:"sva",tag:"主詞動詞一致",type:"blank",
+  sent:[{t:"Each",r:"真正的主詞",clue:1},{t:"of the applicants",r:"修飾"},{slot:1,r:"單數動詞"},{t:"a short interview",r:"受詞"},"with the manager."],
+  opts:["has","have","having","to have"],ans:0,role:["單數","複數","-ing","不定詞"],
+  hint:"Each of … 的主詞是 each，一個一個算。",
+  why:{1:"have 配複數，each 要用單數。",2:"having 不是主要動詞，句子會沒有動詞。",3:"to have 也不是主要動詞。"},
+  rule:[{t:"Each of＋複數名詞",core:1},"→",{t:"單數動詞",core:1}],ruleNote:"Each／Every＋名詞、Each of… 當主詞時，配單數動詞",
+  more:SV_RULE},
+ {id:"w2-tue3",wk:2,day:"tue",cat:"verb",tag:"找主要動詞",type:"blank",
+  sent:[{t:"The new employees",r:"主詞",clue:1},{t:"in the marketing department",r:"修飾"},{slot:1,r:"主要動詞"},{t:"a training session",r:"受詞"},{t:"next week.",r:"未來",clue:1}],
+  opts:["will attend","attending","to attend","attends"],ans:0,role:["未來式","-ing","不定詞","單數現在式"],
+  hint:"這句還缺一個主要動詞，而且 next week 是未來。",
+  why:{1:"attending 不能單獨當主要動詞。",2:"to attend 不能單獨當主要動詞。",3:"attends 配單數主詞，而且不是未來。"},
+  rule:[{t:"主詞",core:1},"+",{t:"主要動詞（要有時態）",core:1}],ruleNote:"每個句子都需要一個有時態的主要動詞",
+  more:'Ving 和 to V 都不能單獨當主要動詞。'},
+ /* ---- Wednesday: sentences ---- */
+ {id:"w2-wed1",wk:2,day:"wed",cat:"main",tag:"找主幹",type:"main",
+  sent:[{t:"The applicant",r:"主詞",sv:1},{t:"who was interviewed yesterday afternoon",r:"修飾",mod:1},{t:"has accepted",r:"動詞",sv:1},{t:"our job offer.",r:"受詞"}],
+  ask:"這句真正的主詞和動詞是？",
+  opts:["The applicant … has accepted","The applicant … was interviewed","yesterday afternoon … has accepted","our job offer … was interviewed"],ans:0,
+  hint:"先拿掉 who 開頭的那張字卡。",
+  why:{1:"was interviewed 在 who 修飾裡。",2:"yesterday afternoon 是時間，不是主詞。",3:"兩張都不是主幹。"},
+  rule:[{t:"主詞",core:1},"+",{t:"who …",r:"修飾"},"+",{t:"動詞",core:1}],ruleNote:"who 後面的動詞是在介紹人",
+  more:'job offer＝錄取通知、工作邀約。'},
+ {id:"w2-wed2",wk:2,day:"wed",cat:"main",tag:"找主幹",type:"main",
+  sent:[{t:"One",r:"主詞",sv:1},{t:"of the managers",r:"修飾",mod:1},{t:"at the Tokyo office",r:"修飾",mod:1},{t:"is retiring",r:"動詞",sv:1},{t:"next month.",r:"時間"}],
+  ask:"這句真正的主詞和動詞是？",
+  opts:["One … is retiring","the managers … is retiring","the Tokyo office … is retiring","the managers … retire"],ans:0,
+  hint:"拿掉 of… 和 at… 兩張字卡，剩下誰？",
+  why:{1:"managers 在 of 修飾裡，而且是複數，配不上 is。",2:"辦公室不會退休，它只是地點。",3:"句子裡沒有 retire 這個形式，主詞也不是 managers。"},
+  rule:[{t:"One of＋複數",core:1},"→",{t:"單數動詞",core:1}],ruleNote:"One of the managers＝其中一位經理（單數）",
+  more:SV_RULE},
+ {id:"w2-wed3",wk:2,day:"wed",cat:"para",tag:"換句話說",type:"para",
+  orig:["Mr. Lopez",{t:"has resigned from his position.",pair:1}],
+  seg:[{t:"Mr. Lopez",r:"主詞"},{t:"has resigned",r:"動詞",clue:1},{t:"from his position.",r:"從職位"}],
+  ask:"哪一句意思最接近？",
+  opts:["Mr. Lopez has left his job.","Mr. Lopez has been promoted.","Mr. Lopez is applying for a position.","Mr. Lopez has signed a contract."],ans:0,
+  alt:["Mr. Lopez",{t:"has left his job.",pair:1}],
+  hint:"resign 是什麼意思？",
+  why:{1:"升職是 promote，跟辭職相反。",2:"原句是離開工作，不是應徵。",3:"sign 跟 resign 長得像，但意思完全不同，是形近陷阱。"},
+  rule:[{t:"resign from",core:1},"=",{t:"leave a job",kw:1},"=",{t:"quit",kw:1}],ruleNote:"resign＝辭職",
+  more:'resign（辭職）≠ sign（簽名）。'},
+ /* ---- Thursday: Part 6 ---- */
+ {id:"w2-thu1",wk:2,day:"thu",cat:"sva",tag:"主詞動詞一致",type:"blank",passage:"w2-thu",label:"空格 (1)",
+  sent:[{t:"Ms. Wu",r:"單數主詞",clue:1},{slot:1,r:"單數動詞"},{t:"ten years of experience",r:"受詞"},"in finance."],
+  opts:["has","have","having","to have"],ans:0,role:["單數","複數","-ing","不定詞"],
+  hint:"主詞是一個人 Ms. Wu。",
+  why:{1:"have 配複數主詞。",2:"having 不能當主要動詞。",3:"to have 不能當主要動詞。"},
+  rule:[{t:"he / she / 一個人",core:1},"+",{t:"has",core:1}],ruleNote:"第三人稱單數用 has",more:SV_RULE},
+ {id:"w2-thu2",linkLabel:"先後順序",full:"Before coming to our company, she worked at a large bank in Singapore.",wk:2,day:"thu",cat:"trans",tag:"連接詞與介系詞",type:"trans",passage:"w2-thu",label:"空格 (2)",
+  seg:[{t:"______",r:"什麼時候？"},{t:"coming to our company,",r:"Ving",clue:1},{t:"she worked",r:"過去"},{t:"at a large bank in Singapore.",r:"地點"}],
+  a:{t:"She worked at a large bank in Singapore.",mood:"up",m:"① 先發生"},
+  b:{t:"She came to our company.",mood:"down",m:"② 後發生"},
+  opts:["Before","Although","Because","However"],ans:0,role:["時間（後面可接 Ving）","讓步（要接完整句子）","原因（要接完整句子）","轉折副詞"],
+  hint:"在銀行工作和來我們公司，哪件事先發生？空格後面接的是 Ving。",
+  why:{1:"Although 後面要接完整句子，而且兩件事沒有相反的意思。",2:"Because 後面要接完整句子，而且這裡不是在說原因。",3:"However 不能直接接 Ving。"},
+  rule:[{t:"Before",core:1},"+",{t:"Ving",kw:1},"+",{t:"句子",r:"主要事件"}],ruleNote:"Before / After 後面可以直接接 Ving",
+  more:'Before coming here＝來這裡之前。'},
+ {id:"w2-thu3",wk:2,day:"thu",cat:"sva",tag:"主詞動詞一致",type:"blank",passage:"w2-thu",label:"空格 (3)",
+  sent:[{t:"Her office,",r:"真正的主詞",clue:1},{t:"along with the offices of her two assistants,",r:"插入語"},{slot:1,r:"單數動詞"},"on the third floor."],
+  opts:["is","are","be","being"],ans:0,role:["單數","複數","原形","-ing"],
+  hint:"along with… 是夾在中間的插入語，真正的主詞是哪一個？",
+  why:{1:"are 被 offices 騙了，along with 不會讓主詞變複數。",2:"be 原形不能當主要動詞。",3:"being 不能當主要動詞。"},
+  rule:[{t:"主詞",core:1},"+",{t:"along with / as well as …",r:"不算"},"+",{t:"動詞跟主詞",core:1}],ruleNote:"along with、together with、as well as 不影響單複數",more:SV_RULE},
+ /* ---- Friday: Part 7 ---- */
+ {id:"w2-fri1",wk:2,day:"fri",cat:"p7",tag:"主旨題",type:"p7",passage:"w2-fri",
+  ask:"What is the purpose of the notice?",
+  opts:["To advertise a job opening","To announce a new store","To introduce a new product","To explain a training schedule"],ans:0,
+  locate:[{t:"Sales Assistant",kw:1},{t:"Wanted",pair:1}],
+  seg:[{t:"Brightway Office Supplies",r:"主詞"},{t:"is looking for",r:"動詞",clue:1},{t:"a full-time sales assistant",r:"找什麼",clue:1},{t:"to join our team in Taipei.",r:"目的"}],
+  alt:["To advertise",{t:"a job opening",pair:1}],
+  hint:"標題的 Wanted 是什麼意思？",
+  why:{1:"文章沒提到新店面。",2:"文章沒介紹產品。",3:"訓練只是福利之一，不是主旨。"},
+  rule:[{t:"… Wanted",core:1},"=",{t:"徵人廣告",kw:1}],ruleNote:"看到 Wanted、is looking for，就是徵才",
+  more:'job opening＝職缺。'},
+ {id:"w2-fri2",wk:2,day:"fri",cat:"p7",tag:"細節題",type:"p7",passage:"w2-fri",
+  ask:"What is required for the position?",
+  opts:["At least one year of sales experience","A university degree in business","The ability to speak Japanese","Experience as a manager"],ans:0,
+  locate:[{t:"Applicants should have",kw:1},{t:"at least one year of sales experience",pair:1},"and good computer skills."],
+  seg:[{t:"Applicants",r:"主詞"},{t:"should have",r:"要具備",clue:1},{t:"at least one year of sales experience",r:"條件 1"},{t:"and good computer skills.",r:"條件 2"}],
+  alt:[{t:"At least one year of sales experience",pair:1}],
+  hint:"required（必要的）在文章裡換成了 should have，找那一句。",
+  why:{1:"文章沒提到學位。",2:"文章沒提到日文。",3:"要的是業務經驗，不是管理經驗。"},
+  rule:[{t:"required",core:1},"=",{t:"should have",kw:1},"=",{t:"must have",kw:1}],ruleNote:"題目的字和文章的字常常不一樣，要找意思相同的",
+  more:'at least＝至少。'},
+ {id:"w2-fri3",wk:2,day:"fri",cat:"para",tag:"推論＋換句話說",type:"p7",passage:"w2-fri",
+  ask:"What is suggested about applicants who are not qualified?",
+  opts:["They will not hear from the company.","They will receive paid training.","They will be interviewed by phone.","They will be sent a new résumé."],ans:0,
+  locate:[{t:"Only qualified candidates",kw:1},{t:"will be contacted",pair:1},"for an interview."],
+  seg:[{t:"Only",r:"只有",clue:1},{t:"qualified candidates",r:"合格的人"},{t:"will be contacted",r:"會被聯絡",clue:1},{t:"for an interview.",r:"目的"}],
+  alt:["They will",{t:"not hear from",pair:1},"the company."],
+  hint:"Only qualified candidates will be contacted：只有合格的人會被聯絡，那不合格的人呢？",
+  why:{1:"訓練是錄取後的福利。",2:"只有合格的人才會有面試。",3:"文章沒提到寄履歷給應徵者。"},
+  rule:[{t:"Only A will be contacted",core:1},"→",{t:"其他人不會被聯絡",kw:1}],ruleNote:"推論題：答案要從原文直接推得出來",
+  more:'be contacted＝被聯絡；hear from＝收到某人的消息。'}
+];
+
+var W2_LISTEN = [
+ {id:"w2-mon4",wk:2,day:"mon",cat:"lis-how",tag:"聽力 Part 2",type:"listen",hint:"How many 問的是數量。",
+  say:"How many people applied for the job?",opts:["About forty.","By e-mail.","Yes, it's a good job."],ans:0,
+  seg:[{t:"How many",r:"問數量",clue:1},{t:"people",r:"人"},{t:"applied for the job?",r:"應徵"}],
+  why:{1:"By e-mail 是在回答「怎麼應徵」，不是幾個人。",2:"How many 不能用 Yes 回答。"},
+  rule:[{t:"How many",core:1},"→",{t:"數字",kw:1}],ruleNote:"How 後面接的字決定答案：How many → 數量",
+  more:'How many → 數量｜How long → 多久｜How much → 價錢'},
+ {id:"w2-mon5",wk:2,day:"mon",cat:"lis-which",tag:"聽力 Part 2",type:"listen",hint:"Which 問的是「哪一個」。",
+  say:"Which candidate did you hire?",opts:["The one with sales experience.","Higher than last year.","At nine tomorrow."],ans:0,
+  seg:[{t:"Which candidate",r:"問哪一位",clue:1},{t:"did you hire?",r:"僱用"}],
+  why:{1:"higher 和 hire 發音很像，是音近陷阱。",2:"這是在回答時間。"},
+  rule:[{t:"Which …?",core:1},"→",{t:"The one …",kw:1}],ruleNote:"Which 的答案常用 The one… 開頭",
+  more:'the one with…＝有…的那一位。'},
+ {id:"w2-wed4",wk:2,day:"wed",cat:"lis-choice",tag:"聽力 Part 2",type:"listen",hint:"問句裡有 or，是要你二選一。",
+  say:"Would you prefer a morning or an afternoon interview?",opts:["The afternoon works better for me.","Yes, I would.","It was a good interview."],ans:0,
+  seg:[{t:"Would you prefer",r:"偏好"},{t:"a morning",r:"選項一"},{t:"or",r:"二選一",clue:1},{t:"an afternoon interview?",r:"選項二"}],
+  why:{1:"二選一的問題不能只回答 Yes。",2:"重複 interview，但時態和意思都不對。"},
+  rule:[{t:"A or B?",core:1},"→",{t:"選一個",kw:1}],ruleNote:"選擇疑問句不能用 Yes／No 回答",
+  more:'works better for me＝對我比較方便。'},
+ {id:"w2-wed5",wk:2,day:"wed",cat:"lis-suggest",tag:"聽力 Part 2",type:"listen",hint:"Why don't we…? 不是在問原因，是在提建議。",
+  say:"Why don't we post the job ad online?",opts:["That's a great idea.","Because it was late.","At the post office."],ans:0,
+  seg:[{t:"Why don't we",r:"提建議",clue:1},{t:"post",r:"張貼"},{t:"the job ad",r:"徵才廣告"},{t:"online?",r:"網路上"}],
+  why:{1:"Why don't we… 是建議，不是問原因，用 Because 回答是陷阱。",2:"重複 post，但 post office 是郵局。"},
+  rule:[{t:"Why don't we …?",core:1},"=",{t:"Let's …",kw:1}],ruleNote:"建議的回答：好主意／好啊／不太好吧",
+  more:'這是 Part 2 最常見的陷阱之一：看到 Why 就選 Because。'},
+ {id:"w2-thu4",kw:"目的（為什麼說這段話）",keySay:"I'm calling to let you know that your job interview has been moved from Tuesday to Thursday at ten A.M.",wk:2,day:"thu",cat:"lis-talk",tag:"聽力 Part 4",type:"talk",hint:"留言一開頭通常就會說打來的目的。",
+  say:"Hello, this is Maria from Human Resources. I'm calling to let you know that your job interview has been moved from Tuesday to Thursday at ten A.M. Please bring two copies of your résumé. If this time doesn't work for you, please call me back.",
+  ask:"Why is the speaker calling?",
+  opts:["To change an interview time","To offer a job","To ask for a phone number","To cancel an interview"],ans:0,
+  seg:[{t:"I'm calling to let you know",r:"打來的目的",clue:1},{t:"that your job interview",r:"面試"},{t:"has been moved",r:"改時間",clue:1},{t:"from Tuesday to Thursday.",r:"新時間"}],
+  why:{1:"還沒錄取，只是面試改時間。",2:"沒有要對方的電話號碼。",3:"是改期（moved），不是取消。"},
+  rule:[{t:"I'm calling to …",core:1},"→",{t:"目的題的答案",kw:1}],ruleNote:"電話留言的目的，通常在 I'm calling to… 後面",
+  more:'has been moved＝被改時間了。'}
+];
+
+var W2_TWINS = [
+ {id:"w2-mon1-t",wk:2,cat:"vocab",tag:"單字",type:"blank",
+  sent:[{t:"We",r:"主詞"},{t:"need to",join:1},{slot:1,r:"動詞"},{t:"more staff",r:"人（受詞）",clue:1},"for the busy holiday season."],
+  opts:["hire","retire","resign","apply"],ans:0,role:["僱用","退休","辭職","申請"],
+  hint:"旺季到了，公司需要對「更多員工」做什麼？",
+  why:{1:"retire 是自己退休，不能接人。",2:"resign 是自己辭職。",3:"apply 要加 for，而且是應徵者做的事。"},
+  rule:[{t:"hire",core:1},"+",{t:"staff",kw:1}],ruleNote:"hire＝僱用",more:'staff＝員工（集合名詞）。'},
+ {id:"w2-mon2-t",wk:2,cat:"vocab",tag:"單字",type:"blank",
+  sent:[{t:"After five years in sales,",r:"時間"},{t:"Mr. Ford",r:"主詞"},{t:"was",join:1},{slot:1,r:"被…"},{t:"to department head.",r:"升到哪裡",clue:1}],
+  opts:["promoted","applied","resigned","retired"],ans:0,role:["升職","申請","辭職","退休"],
+  hint:"was ___ to department head：被「升」到部門主管。",
+  why:{1:"apply 要加 for。",2:"resign 不會「到主管」。",3:"retire 不會「到主管」。"},
+  rule:[{t:"be promoted",core:1},"+",{t:"to＋職位",kw:1}],ruleNote:"be promoted to＝升為",more:'department head＝部門主管。'},
+ {id:"w2-mon3-t",wk:2,cat:"vocab",tag:"單字",type:"blank",
+  sent:[{t:"Applicants",r:"主詞"},{t:"must send a",join:1},{slot:1,r:"東西"},{t:"and a cover letter",r:"另一份文件",clue:1},"by Friday."],
+  opts:["résumé","candidate","position","personnel"],ans:0,role:["履歷","候選人","職位","人員"],
+  hint:"和 cover letter（求職信）一起寄出的是什麼？",
+  why:{1:"candidate 是人，不能寄。",2:"position 是職位，不能寄。",3:"personnel 是人員或人事部。"},
+  rule:[{t:"a résumé",core:1},"+",{t:"a cover letter",kw:1}],ruleNote:"應徵兩件套：履歷＋求職信",more:'cover letter＝求職信。'},
+ {id:"w2-mon4-t",wk:2,cat:"lis-how",tag:"聽力 Part 2",type:"listen",hint:"How long 問的是多久。",
+  say:"How long is the training program?",opts:["About two weeks.","In the main office.","Yes, it was very long."],ans:0,
+  seg:[{t:"How long",r:"問多久",clue:1},{t:"is the training program?",r:"訓練課程"}],
+  why:{1:"這是在回答「哪裡」。",2:"How long 不能用 Yes 回答。"},
+  rule:[{t:"How long",core:1},"→",{t:"一段時間",kw:1}],ruleNote:"How long → 多久",more:'training program＝訓練課程。'},
+ {id:"w2-mon5-t",wk:2,cat:"lis-which",tag:"聽力 Part 2",type:"listen",hint:"Which department 問的是哪一個部門。",
+  say:"Which department will the new employee work in?",opts:["Probably marketing.","She's working very hard.","A new employer."],ans:0,
+  seg:[{t:"Which department",r:"問哪個部門",clue:1},{t:"will the new employee",r:"新員工"},{t:"work in?",r:"在…工作"}],
+  why:{1:"重複 work，但沒有回答哪個部門。",2:"employer 和 employee 很像，是形近陷阱。"},
+  rule:[{t:"Which …?",core:1},"→",{t:"說出其中一個",kw:1}],ruleNote:"Probably…（大概是…）也是好答案",more:'employer（雇主）≠ employee（員工）。'},
+ {id:"w2-tue1-t",wk:2,cat:"sva",tag:"主詞動詞一致",type:"blank",
+  sent:[{t:"The results",r:"真正的主詞",clue:1},{t:"of the employee survey",r:"修飾"},{slot:1,r:"複數動詞"},"been sent to all managers."],
+  opts:["has","have","having","is"],ans:1,role:["單數","複數","-ing","單數 be"],
+  hint:"真正的主詞是 results（複數）還是 survey？",
+  why:{0:"has 配單數，被 survey 騙了。",2:"having 不能當主要動詞。",3:"is been 文法不成立。"},
+  rule:[{t:"The results",core:1,r:"複數"},"+",{t:"of …",r:"可拿掉"},"+",{t:"have",core:1}],ruleNote:"of 後面的名詞不是主詞",more:SV_RULE},
+ {id:"w2-tue2-t",wk:2,cat:"sva",tag:"主詞動詞一致",type:"blank",
+  sent:[{t:"Every new employee",r:"單數主詞",clue:1},{slot:1,r:"單數動詞"},{t:"to complete a safety course.",r:"要做的事"}],
+  opts:["needs","need","needing","to need"],ans:0,role:["單數","複數","-ing","不定詞"],
+  hint:"Every 後面的名詞是單數。",
+  why:{1:"need 配複數。",2:"needing 不能當主要動詞。",3:"to need 不能當主要動詞。"},
+  rule:[{t:"Every＋單數名詞",core:1},"→",{t:"單數動詞",core:1}],ruleNote:"Each／Every＋名詞當主詞時，配單數動詞",more:SV_RULE},
+ {id:"w2-tue3-t",wk:2,cat:"verb",tag:"找主要動詞",type:"blank",
+  sent:[{t:"The applicants",r:"主詞",clue:1},{t:"for the sales position",r:"修飾"},{slot:1,r:"主要動詞"},{t:"their interviews",r:"受詞"},{t:"yesterday.",r:"過去",clue:1}],
+  opts:["had","having","to have","has"],ans:0,role:["過去式","-ing","不定詞","單數現在式"],
+  hint:"缺主要動詞，yesterday 是過去。",
+  why:{1:"having 不能當主要動詞。",2:"to have 不能當主要動詞。",3:"has 配單數，而且不是過去。"},
+  rule:[{t:"主詞",core:1},"+",{t:"有時態的動詞",core:1}],ruleNote:"yesterday → 過去式",more:'had an interview＝參加了面試。'},
+ {id:"w2-wed1-t",wk:2,cat:"main",tag:"找主幹",type:"main",
+  sent:[{t:"The manager",r:"主詞",sv:1},{t:"who reviewed the applications",r:"修飾",mod:1},{t:"has chosen",r:"動詞",sv:1},{t:"three candidates.",r:"受詞"}],
+  ask:"這句真正的主詞和動詞是？",
+  opts:["The manager … has chosen","The manager … reviewed","the applications … has chosen","three candidates … reviewed"],ans:0,
+  hint:"先拿掉 who 開頭的字卡。",
+  why:{1:"reviewed 在 who 修飾裡。",2:"applications 是被看的東西，不會選人。",3:"兩張都不是主幹。"},
+  rule:[{t:"主詞",core:1},"+",{t:"who …",r:"修飾"},"+",{t:"動詞",core:1}],ruleNote:"who 後面的動詞是在介紹人",more:'review the applications＝審閱申請資料。'},
+ {id:"w2-wed2-t",wk:2,cat:"main",tag:"找主幹",type:"main",
+  sent:[{t:"The quality",r:"主詞",sv:1},{t:"of the applications",r:"修飾",mod:1},{t:"this year",r:"時間"},{t:"is",r:"動詞",sv:1},{t:"very high.",r:"補語"}],
+  ask:"這句真正的主詞和動詞是？",
+  opts:["The quality … is","the applications … is","this year … is","The quality … are"],ans:0,
+  hint:"拿掉 of… 那張字卡，主詞是單數還是複數？",
+  why:{1:"applications 在 of 修飾裡，而且是複數。",2:"this year 是時間。",3:"quality 是單數，配 is，不是 are。"},
+  rule:[{t:"The quality",core:1,r:"單數"},"+",{t:"of …",r:"修飾"},"+",{t:"is",core:1}],ruleNote:"of 後面的名詞不是主詞",more:SV_RULE},
+ {id:"w2-wed3-t",wk:2,cat:"para",tag:"換句話說",type:"para",
+  orig:["Ms. Grant",{t:"will retire",pair:1},{t:"at the end of the year.",pair:2}],
+  seg:[{t:"Ms. Grant",r:"主詞"},{t:"will retire",r:"動詞",clue:1},{t:"at the end of the year.",r:"時間"}],
+  ask:"哪一句意思最接近？",
+  opts:["Ms. Grant will stop working when the year ends.","Ms. Grant will start a new job next year.","Ms. Grant will be promoted this year.","Ms. Grant will return to work next year."],ans:0,
+  alt:["Ms. Grant",{t:"will stop working",pair:1},{t:"when the year ends.",pair:2}],
+  hint:"retire 是什麼意思？",
+  why:{1:"退休不是換新工作。",2:"退休不是升職。",3:"退休後不會回來工作。"},
+  rule:[{t:"retire",core:1},"=",{t:"stop working",kw:1}],ruleNote:"retire＝退休",more:'at the end of the year＝when the year ends'},
+ {id:"w2-wed4-t",wk:2,cat:"lis-choice",tag:"聽力 Part 2",type:"listen",hint:"又是 A or B 的二選一。",
+  say:"Should we hold the interview in person or online?",opts:["Online would be easier.","Yes, we should.","He's a nice person."],ans:0,
+  seg:[{t:"Should we hold the interview",r:"辦面試"},{t:"in person",r:"選項一"},{t:"or",r:"二選一",clue:1},{t:"online?",r:"選項二"}],
+  why:{1:"二選一不能只回答 Yes。",2:"重複 person，但意思不對。"},
+  rule:[{t:"A or B?",core:1},"→",{t:"選一個",kw:1}],ruleNote:"選擇疑問句不能用 Yes／No",more:'in person＝當面。'},
+ {id:"w2-wed5-t",wk:2,cat:"lis-suggest",tag:"聽力 Part 2",type:"listen",hint:"Why don't you…? 是建議。",
+  say:"Why don't you apply for the manager position?",opts:["Maybe I will.","Because he's the manager.","The application is on the desk."],ans:0,
+  seg:[{t:"Why don't you",r:"提建議",clue:1},{t:"apply for",r:"應徵"},{t:"the manager position?",r:"經理職位"}],
+  why:{1:"建議不是問原因，Because 是陷阱。",2:"application 和 apply 很像，但沒有回應建議。"},
+  rule:[{t:"Why don't you …?",core:1},"=",{t:"你何不…",kw:1}],ruleNote:"回答建議：Maybe I will／Good idea",more:'apply for＝應徵。'},
+ {id:"w2-thu1-t",wk:2,cat:"sva",tag:"主詞動詞一致",type:"blank",passage:"w2-thu-t",label:"空格 (1)",
+  sent:[{t:"Each intern",r:"單數主詞",clue:1},{slot:1,r:"單數動詞"},{t:"a mentor",r:"受詞"},"from our team."],
+  opts:["has","have","having","to have"],ans:0,role:["單數","複數","-ing","不定詞"],
+  hint:"Each 後面是單數。",
+  why:{1:"have 配複數。",2:"having 不能當主要動詞。",3:"to have 不能當主要動詞。"},
+  rule:[{t:"Each＋單數名詞",core:1},"→",{t:"has",core:1}],ruleNote:"each 配單數",more:'mentor＝指導員。'},
+ {id:"w2-thu2-t",linkLabel:"那一天",full:"On their first day, the interns will attend an orientation.",wk:2,cat:"trans",tag:"連接詞與介系詞",type:"trans",passage:"w2-thu-t",label:"空格 (2)",
+  seg:[{t:"______",r:"什麼時候？"},{t:"their first day,",r:"名詞（日子）",clue:1},{t:"the interns",r:"主詞"},{t:"will attend an orientation.",r:"動作"}],
+  a:{t:"their first day",mood:"up",m:"① 一個日子"},
+  b:{t:"the interns will attend an orientation.",mood:"down",m:"② 那天要做的事"},
+  opts:["On","Although","Because","However"],ans:0,role:["介系詞（接日子）","讓步（要接完整句子）","原因（要接完整句子）","轉折副詞"],
+  hint:"空格後面接的是「日子」，日子前面用哪個介系詞？",
+  why:{1:"Although 後面要接完整句子。",2:"Because 後面要接完整句子。",3:"However 不能直接接名詞。"},
+  rule:[{t:"On",core:1},"+",{t:"日子 / 星期 / 日期",kw:1}],ruleNote:"on Monday、on May 6、on their first day",more:'orientation＝新人說明會。'},
+ {id:"w2-thu3-t",wk:2,cat:"sva",tag:"主詞動詞一致",type:"blank",passage:"w2-thu-t",label:"空格 (3)",
+  sent:[{t:"The schedule,",r:"真正的主詞",clue:1},{t:"together with the list of mentors,",r:"插入語"},{slot:1,r:"單數動詞"},"been posted on the bulletin board."],
+  opts:["has","have","having","to have"],ans:0,role:["單數","複數","-ing","不定詞"],
+  hint:"together with… 是插入語，真正的主詞是哪一個？",
+  why:{1:"have 被 mentors 騙了。",2:"having 不能當主要動詞。",3:"to have 不能當主要動詞。"},
+  rule:[{t:"主詞",core:1},"+",{t:"together with …",r:"不算"},"+",{t:"動詞跟主詞",core:1}],ruleNote:"together with 不影響單複數",more:SV_RULE},
+ {id:"w2-thu4-t",kw:"要聽眾做的事",keySay:"Before we finish today's training, please fill out the short survey on your desk.",wk:2,cat:"lis-talk",tag:"聽力 Part 4",type:"talk",hint:"注意 please 後面的請求。",
+  say:"Good afternoon, everyone. Before we finish today's training, please fill out the short survey on your desk. Your answers will help us improve future training sessions. Please leave the survey with me at the door.",
+  ask:"What are listeners asked to do?",
+  opts:["Complete a survey","Attend another training session","Clean their desks","Call the speaker later"],ans:0,
+  seg:[{t:"please fill out",r:"請求",clue:1},{t:"the short survey",r:"問卷"},{t:"on your desk.",r:"地點"}],
+  why:{1:"說話者說的是改善「以後的」課程，沒有要大家再上一堂。",2:"desk 只是問卷放的地方。",3:"沒有要大家打電話。"},
+  rule:[{t:"fill out",core:1},"=",{t:"complete",kw:1}],ruleNote:"fill out a survey＝complete a survey",more:'survey＝問卷。'},
+ {id:"w2-fri1-t",wk:2,cat:"p7",tag:"主旨題",type:"p7",passage:"w2-fri-t",
+  ask:"What is the purpose of the notice?",
+  opts:["To recognize an employee","To announce a job opening","To explain a new parking rule","To schedule a training session"],ans:0,
+  locate:[{t:"Employee of the Month",pair:1}],
+  seg:[{t:"Congratulations",r:"恭喜",clue:1},{t:"to Daniel Kim",r:"對象"},{t:"who has been named",r:"被選為"},{t:"Employee of the Month.",r:"每月最佳員工",clue:1}],
+  alt:["To",{t:"recognize an employee",pair:1}],
+  hint:"標題和 Congratulations 告訴你什麼？",
+  why:{1:"文章沒有在徵人。",2:"停車位是獎勵，不是新規定。",3:"文章沒提到訓練。"},
+  rule:[{t:"Congratulations",core:1},"→",{t:"表揚",kw:1}],ruleNote:"recognize＝表揚、肯定",more:'Employee of the Month＝每月最佳員工。'},
+ {id:"w2-fri2-t",wk:2,cat:"p7",tag:"細節題",type:"p7",passage:"w2-fri-t",
+  ask:"How many calls did Mr. Kim answer last month?",
+  opts:["About 50","About 100","More than 500","Exactly 400"],ans:2,
+  locate:["Mr. Kim answered",{t:"more than 500",pair:1},{t:"customer calls",kw:1},"last month."],
+  seg:[{t:"Mr. Kim",r:"主詞"},{t:"answered",r:"動詞"},{t:"more than 500",r:"數量",clue:1},{t:"customer calls",r:"電話"},{t:"last month.",r:"時間"}],
+  alt:[{t:"More than 500",pair:1}],
+  hint:"找 calls 這個字，看它前面的數字。",
+  why:{0:"文章沒有這個數字。",1:"文章沒有這個數字。",3:"文章說的是超過 500，不是剛好 400。"},
+  rule:[{t:"How many",core:1},"→",{t:"找數字",kw:1}],ruleNote:"數字題：先找關鍵字，再看旁邊的數字",more:'more than＝超過。'},
+ {id:"w2-fri3-t",wk:2,cat:"para",tag:"換句話說",type:"p7",passage:"w2-fri-t",
+  ask:"What will Mr. Kim receive?",
+  opts:["A special place to park","A promotion","A new office","A free lunch"],ans:0,
+  locate:["He will receive a gift card and",{t:"a reserved parking space",pair:1},"for October."],
+  seg:[{t:"He",r:"主詞"},{t:"will receive",r:"動詞",clue:1},{t:"a gift card",r:"獎品 1"},{t:"and a reserved parking space",r:"獎品 2",clue:1},{t:"for October.",r:"時間"}],
+  alt:[{t:"A special place to park",pair:1}],
+  hint:"找 receive 那一句，看他會得到什麼。",
+  why:{1:"文章沒說升職。",2:"文章沒提到新辦公室。",3:"文章沒提到午餐。"},
+  rule:[{t:"a reserved parking space",core:1},"=",{t:"a special place to park",kw:1}],ruleNote:"換句話說：保留車位＝專屬停車位",more:'reserved＝保留的、預訂的。'}
+];
+Q = Q.concat(W2).concat(W2_LISTEN);
+TWINS = TWINS.concat(W2_TWINS);
+var WORDS2 = [["applicant","a qualified applicant","應徵者"],["candidate","the best candidate","候選人"],["qualified","be qualified for","合格的"],["résumé","send a résumé","履歷"],["hire","hire new staff","僱用"],["position","fill a position","職位"],["promote","be promoted to","升職"],["resign","resign from a job","辭職"]];
+
+var W2_TUE = [
+ {id:"w2-tue4",wk:2,day:"tue",cat:"lis-neg",tag:"聽力 Part 2",type:"listen",hint:"否定問句（Didn't you…?）照一般問句回答就好：有做就 Yes，沒做就 No。",
+  say:"Didn't you send the job offer yesterday?",opts:["No, I'll send it this afternoon.","A special offer on shoes.","Yes, they did."],ans:0,
+  seg:[{t:"Didn't you",r:"否定問句",clue:1},{t:"send",r:"寄"},{t:"the job offer",r:"錄取通知"},{t:"yesterday?",r:"時間"}],
+  why:{1:"重複 offer，但 special offer 是「特價」，同字陷阱。",2:"問的是 you，回答卻變成 they，主詞對不上。"},
+  rule:[{t:"Didn't you …?",core:1},"→",{t:"照事實回答 Yes／No",kw:1}],ruleNote:"否定問句不用想太多：沒寄就說 No",
+  more:'job offer＝錄取通知；special offer＝特價。'},
+ {id:"w2-tue5",wk:2,day:"tue",cat:"lis-statement",tag:"聽力 Part 2",type:"listen",hint:"這不是問句，是一句陳述，找一個自然的回應。",
+  say:"The new manager starts on Monday.",opts:["I'm looking forward to meeting her.","He managed it very well.","A new management course."],ans:0,
+  seg:[{t:"The new manager",r:"新經理",clue:1},{t:"starts",r:"開始上班",clue:1},{t:"on Monday.",r:"時間"}],
+  why:{1:"managed 和 manager 很像，但時態和意思都對不上。",2:"management 也是形近陷阱，沒有回應這句話。"},
+  rule:[{t:"陳述句",core:1},"→",{t:"自然的回應",kw:1}],ruleNote:"陳述句沒有疑問詞，要想「聽到這句話會怎麼接」",
+  more:'look forward to＋Ving＝期待。'}
+];
+var W2_TUE_T = [
+ {id:"w2-tue4-t",wk:2,cat:"lis-neg",tag:"聽力 Part 2",type:"listen",hint:"否定問句：還沒公布就說 Not yet。",
+  say:"Haven't the interview results been announced?",opts:["Not yet, maybe tomorrow.","The interview room is ready.","They're very nice people."],ans:0,
+  seg:[{t:"Haven't",r:"否定問句",clue:1},{t:"the interview results",r:"面試結果"},{t:"been announced?",r:"被公布"}],
+  why:{1:"重複 interview，但沒有回答結果公布了沒。",2:"沒有回答問題。"},
+  rule:[{t:"Haven't … ?",core:1},"→",{t:"Not yet／Yes, …",kw:1}],ruleNote:"Not yet＝還沒",more:'announce＝公布。'},
+ {id:"w2-tue5-t",wk:2,cat:"lis-statement",tag:"聽力 Part 2",type:"listen",hint:"對方在說找不到東西，最自然的回應是什麼？",
+  say:"I can't find the list of applicants.",opts:["It's on my desk.","Twenty-five applicants.","He applied last week."],ans:0,
+  seg:[{t:"I can't find",r:"找不到",clue:1},{t:"the list",r:"名單"},{t:"of applicants.",r:"應徵者"}],
+  why:{1:"重複 applicants，但沒有幫對方找到名單。",2:"applied 和 applicants 很像，答非所問。"},
+  rule:[{t:"找不到…",core:1},"→",{t:"告訴他在哪裡",kw:1}],ruleNote:"陳述句的回應要接得上話",more:'applicant＝應徵者。'}
+];
+Q = Q.concat(W2_TUE);
+TWINS = TWINS.concat(W2_TUE_T);
+
+/* ---------- weeks ---------- */
+var WEEKS = {1:{title:"第 1 週・詞性判斷 × 辦公室與會議",words:WORDS,sub:{tue:"3 題詞性判斷、2 題聽力。"}},
+             2:{title:"第 2 週・主詞與動詞 × 人事與招聘",words:WORDS2,sub:{tue:"3 題主詞與動詞、2 題聽力。"}}};
+var WEEK = (function(){ try{ var w=+localStorage.getItem("toeic-week"); return WEEKS[w]?w:2; }catch(e){ return 2; } })();
+function pk(day){ return WEEK===1 ? day : "w"+WEEK+"-"+day; }
+function renderWeeks(){
+  var box=document.getElementById("weeks"); box.innerHTML="";
+  Object.keys(WEEKS).forEach(function(k){
+    var w=+k, b=el("button","wk"+(w===WEEK?" on":""),"第 "+w+" 週"); b.type="button";
+    b.setAttribute("aria-pressed",w===WEEK?"true":"false");
+    b.addEventListener("click",function(){ WEEK=w; try{ localStorage.setItem("toeic-week",String(w)); }catch(e){} view="day"; render(); });
+    box.appendChild(b);
+  });
+  document.getElementById("eyebrow").textContent=WEEKS[WEEK].title;
+}
 function stemText(q){
   var src = q.sent || q.orig || [];
   return src.map(function(c){ return typeof c==="string"?c:(c.slot?"______":c.t); }).join(" ");
@@ -1005,6 +1498,7 @@ function renderQ(q,num){
     pl.addEventListener("click",function(){ speakSeq(playItems(q)); });
     pb.appendChild(pl); pb.appendChild(rateChips());
     box.appendChild(pb);
+    var al=accentLabel(q); if(al) box.appendChild(el("div","small accent",al));
     box.appendChild(el("div","ask",q.type==="talk"?"聽完廣播，回答下面的問題：":"聽一句問句和三個回應，選出最適合的回應。題目不會顯示文字，跟真正的考試一樣。"));
     if(q.type==="talk") box.appendChild(el("div","stem",esc(q.ask)));
   }
@@ -1012,7 +1506,7 @@ function renderQ(q,num){
 
   /* options */
   var long = q.type!=="blank" && q.type!=="trans" && q.type!=="listen";
-  var locked = a.phase==="seg";
+  var locked = a.phase==="seg" || a.phase==="kw";
   var opts=el("div","opts"+(long?" long":""));
   q.opts.forEach(function(t,i){
     var hide = q.type==="listen" && !a.done;
@@ -1026,7 +1520,7 @@ function renderQ(q,num){
   box.appendChild(opts);
 
   var fb=el("div","explain"); box.appendChild(fb);
-  if(!a.done && a.tries===1) fb.appendChild(segPanel(q,a));
+  if(!a.done && a.tries===1) fb.appendChild((q.type==="listen"||q.type==="talk") ? kwPanel(q,a) : segPanel(q,a));
   if(a.done){
     var st=el("div","status");
     if(a.first && !a.guessed){
@@ -1112,7 +1606,7 @@ function segPanel(q,a){
 function transHTML(q,solved){
   var w=el("div","flow");
   w.innerHTML='<div class="scard"><span class="mood '+q.a.mood+'">'+q.a.m+'</span>'+esc(q.a.t)+'</div>'+
-    '<div class="link"><span class="w">'+(solved?esc(q.opts[q.ans]):"？")+'</span><span class="r">'+(solved?"轉折 ↷":"方向？")+'</span></div>'+
+    '<div class="link"><span class="w">'+(solved?esc(q.opts[q.ans]):"？")+'</span><span class="r">'+(solved?(q.linkLabel||"轉折 ↷"):"方向？")+'</span></div>'+
     '<div class="scard"><span class="mood '+q.b.mood+'">'+q.b.m+'</span>'+esc(q.b.t)+'</div>';
   return w;
 }
@@ -1126,17 +1620,17 @@ function explain(q,a,fb){
 
   /* 2. tile breakdown (green) */
   var why=el("div","panel why",'<h4>🔍 字卡拆解：為什麼是這個答案</h4>');
-  var full = q.type==="blank" ? stemText(q).replace("______",q.opts[q.ans]) : (q.type==="main"||q.type==="para") ? stemText(q) : (q.type==="trans" ? q.a.t+" "+q.opts[q.ans]+", "+q.b.t : "");
+  var full = fullText(q);
   if(full){ var sr=el("div","row"); sr.appendChild(sayBtn(full,"聽整句")); why.appendChild(sr); }
   if(q.type==="listen"||q.type==="talk"){
     why.appendChild(el("div","sub",q.type==="talk"?"廣播內容：":"題目念的是："));
-    var tr0=el("div","row"); tr0.appendChild(sayBtn(q.say,"再聽一次")); tr0.appendChild(el("span","en",esc(q.say))); why.appendChild(tr0);
+    var tr0=el("div","row"); tr0.appendChild(sayBtn(q.say,"再聽一次",q.type==="talk"?"us_a":"us_q")); tr0.appendChild(el("span","en",esc(q.say))); why.appendChild(tr0);
     why.appendChild(el("div","sub",q.type==="talk"?"關鍵句拆成字卡：":"拆成字卡，先抓第一張："));
     why.appendChild(el("div","",rowHTML(q.seg,{roles:true,clues:true})));
     why.appendChild(el("div","sub","每個選項："));
     q.opts.forEach(function(o,k){
       var r=el("div","tryrow"); var line=el("div","row");
-      if(q.type==="listen") line.appendChild(sayBtn(o));
+      if(q.type==="listen") line.appendChild(sayBtn(L[k]+". "+o,null,"us_a"));
       line.appendChild(el("span","en",(k===q.ans?'✔ ':'✕ ')+L[k]+'. '+esc(o)));
       r.appendChild(line);
       r.appendChild(el("div","because",k===q.ans?'<b class="ok-b">✔</b><span>這是正確的回應。</span>':'<b>✕</b><span>'+esc(q.why[k])+'</span>'));
@@ -1189,7 +1683,7 @@ function explain(q,a,fb){
 }
 
 function choose(q,i){
-  var a=state.answers[q.key||q.id]; if(a.done||a.phase==="seg") return;
+  var a=state.answers[q.key||q.id]; if(a.done||a.phase==="seg"||a.phase==="kw") return;
   if(i===q.ans){
     a.done=true; a.first=(a.tries===0); a.phase="";
     if(!a.first) logBook(q,"答錯");
@@ -1197,7 +1691,7 @@ function choose(q,i){
   } else {
     if(a.picked.indexOf(i)<0) a.picked.push(i);
     a.tries++;
-    if(a.tries===1){ a.phase="seg"; a.cuts=[]; }
+    if(a.tries===1){ if(q.type==="listen"||q.type==="talk"){ a.phase="kw"; a.kwPick=""; } else { a.phase="seg"; a.cuts=[]; } }
     if(a.tries>=2){ a.done=true; a.first=false; a.phase=""; logBook(q,"答錯"); }
   }
   save(); render();
