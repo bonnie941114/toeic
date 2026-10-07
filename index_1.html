@@ -1,0 +1,1246 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+</head>
+<body>
+<title>多益每日三題</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&family=Literata:opsz,wght@7..72,400;7..72,600&family=Noto+Sans+TC:wght@400;500;700;900&display=swap">
+<style>
+/* Layout: one column (max 48rem). Sentences are shown as rows of word tiles; explanations re-assemble those tiles.
+   Four-colour memory scheme: blue = words to remember, yellow = hint / look here / mismatch, green = why (understanding), red = core answer & rule. */
+:root{
+  --bg:#f3f6ff; --surface:#ffffff; --ink:#1c2333; --muted:#5d687d; --line:#dbe2f2; --tile:#eef2fb; --shadow:#d3dbee;
+  --blue:#2f66f5; --blue-ink:#1f4fd0; --blue-soft:#e4ecff;
+  --yellow:#ffc53d; --yellow-ink:#8a5a00; --yellow-soft:#fff3cc;
+  --green:#18a866; --green-ink:#11774a; --green-soft:#ddf5e8;
+  --red:#f04857; --red-ink:#c42634; --red-soft:#ffe4e7;
+  --f-ui:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --f-en:"Nunito","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --f-doc:"Literata",Georgia,"Times New Roman",serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#11151f; --surface:#1a2030; --ink:#e8ecf5; --muted:#a0abc0; --line:#2c3549; --tile:#232b3d; --shadow:#0b0e15;
+  --blue:#7c9dff; --blue-ink:#a9c0ff; --blue-soft:#1d2a4c;
+  --yellow:#ffcf5a; --yellow-ink:#ffd978; --yellow-soft:#3a3016;
+  --green:#4cd696; --green-ink:#7ee3b2; --green-soft:#153529;
+  --red:#ff7883; --red-ink:#ff9aa3; --red-soft:#3f1d24; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11151f; --surface:#1a2030; --ink:#e8ecf5; --muted:#a0abc0; --line:#2c3549; --tile:#232b3d; --shadow:#0b0e15;
+  --blue:#7c9dff; --blue-ink:#a9c0ff; --blue-soft:#1d2a4c;
+  --yellow:#ffcf5a; --yellow-ink:#ffd978; --yellow-soft:#3a3016;
+  --green:#4cd696; --green-ink:#7ee3b2; --green-soft:#153529;
+  --red:#ff7883; --red-ink:#ff9aa3; --red-soft:#3f1d24; color-scheme:dark}
+
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-ui);font-size:16px;line-height:1.6}
+.wrap{max-width:48rem;margin:0 auto;padding-inline:16px;padding-block:18px 64px}
+h1,h2,h3,h4{text-wrap:balance;margin:0;line-height:1.3}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px;border-radius:8px}
+svg.i{width:14px;height:14px;flex:0 0 auto;vertical-align:-2px}
+
+/* header */
+header.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:44px;height:44px;border-radius:12px;display:grid;grid-template-columns:1fr 1fr;gap:3px;padding:6px;background:var(--surface);box-shadow:0 2px 0 var(--shadow)}
+.logo i{border-radius:4px}
+.eyebrow{font-size:.78rem;color:var(--muted);letter-spacing:.06em}
+h1{font-size:1.4rem;font-weight:900}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px;cursor:pointer;font-size:.9rem;box-shadow:0 2px 0 var(--shadow)}
+.btn:hover{border-color:var(--blue)}
+.btn:active{transform:translateY(1px);box-shadow:none}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.ghost{box-shadow:none}
+
+.legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.legend span{display:inline-flex;align-items:center;gap:6px;font-size:.8rem;border-radius:999px;padding:3px 10px;font-weight:500}
+.lg-b{background:var(--blue-soft);color:var(--blue-ink)}
+.lg-y{background:var(--yellow-soft);color:var(--yellow-ink)}
+.lg-g{background:var(--green-soft);color:var(--green-ink)}
+.lg-r{background:var(--red-soft);color:var(--red-ink)}
+
+/* days */
+nav.days{display:flex;gap:8px;margin-top:16px;overflow-x:auto;padding:2px 2px 6px;-webkit-overflow-scrolling:touch}
+nav.days button{flex:0 0 auto;border:1.5px solid var(--line);background:var(--surface);border-radius:14px;padding:8px 12px;cursor:pointer;text-align:left;min-width:4.4rem;box-shadow:0 2px 0 var(--shadow)}
+nav.days .d{display:block;font-weight:900}
+nav.days .t{display:block;font-size:.75rem;color:var(--muted)}
+nav.days button[aria-current="true"]{border-color:var(--blue);background:var(--blue-soft)}
+nav.days .ok{color:var(--green-ink);font-weight:700}
+
+.dayhead{margin-top:20px;display:flex;gap:14px;align-items:center}
+.badge{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;font-weight:900;font-size:1.3rem;color:#fff;flex:0 0 auto;box-shadow:0 3px 0 var(--shadow)}
+.dayhead h2{font-size:1.2rem;font-weight:900}
+.dayhead p{margin:2px 0 0;color:var(--muted);font-size:.9rem}
+.progress{display:flex;gap:6px;margin-top:6px}
+.progress i{width:26px;height:6px;border-radius:3px;background:var(--line)}
+.progress i.on{background:var(--green)}
+.progress i.half{background:var(--yellow)}
+
+/* passages */
+.passage{margin-top:14px;background:var(--surface);border-radius:16px;padding:16px 18px;font-family:var(--f-doc);font-size:1.02rem;line-height:1.75;box-shadow:0 2px 0 var(--shadow);border:1.5px solid var(--line)}
+.passage .meta{font-family:var(--f-ui);font-size:.82rem;color:var(--muted);display:grid;gap:1px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.passage h3{font-family:var(--f-doc);font-size:1.1rem;margin-bottom:6px}
+.blank{display:inline-block;min-width:2.6em;padding:0 6px;border-radius:8px;background:var(--blue-soft);color:var(--blue-ink);text-align:center;font-family:var(--f-en);font-size:.85rem;font-weight:800}
+
+/* question card */
+.qlist{display:grid;gap:18px;margin-top:16px}
+.q{background:var(--surface);border-radius:18px;padding:16px;display:grid;gap:14px;min-width:0;border:1.5px solid var(--line);box-shadow:0 3px 0 var(--shadow)}
+.qtop{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.qnum{font-weight:900;font-size:.95rem}
+.tag{font-size:.75rem;border-radius:999px;padding:2px 10px;background:var(--tile);color:var(--muted);font-weight:500}
+.ask{font-size:.92rem;color:var(--muted)}
+
+/* tiles */
+.tiles{display:flex;flex-wrap:wrap;gap:10px 6px;align-items:flex-start}
+.tile{display:inline-flex;flex-direction:column;align-items:center;gap:3px;max-width:100%}
+.tile .w{font-family:var(--f-en);font-weight:700;font-size:1.02rem;line-height:1.35;background:var(--tile);border:2px solid transparent;border-radius:12px;padding:6px 10px;box-shadow:0 2px 0 var(--shadow);text-align:center;max-width:100%;overflow-wrap:anywhere}
+.tile .r{font-size:.72rem;color:var(--muted);display:inline-flex;gap:3px;align-items:center;white-space:nowrap}
+.tile.slot .w{background:var(--blue-soft);border:2px dashed var(--blue);color:var(--blue-ink);min-width:4.2em}
+.tile.clue .w{background:var(--yellow-soft);border-color:var(--yellow)}
+.tile.clue .r{color:var(--yellow-ink);font-weight:700}
+.tile.kw .w{background:var(--blue-soft);border-color:var(--blue);color:var(--blue-ink)}
+.tile.ans .w{background:var(--red-soft);border-color:var(--red);color:var(--red-ink)}
+.tile.ans .r{color:var(--red-ink);font-weight:700}
+.tile.bad .w{background:var(--yellow-soft);border:2px dashed var(--yellow);color:var(--yellow-ink);text-decoration:line-through}
+.tile.mod .w{background:transparent;border:2px dashed var(--line);box-shadow:none;color:var(--muted);font-weight:500}
+.tile.core .w{background:var(--red-soft);border-color:var(--red);color:var(--red-ink)}
+.trimmed .tile.mod{opacity:.35}
+.trimmed .tile.mod .w{text-decoration:line-through}
+.trimmed .tile.sv .w{background:var(--red-soft);border-color:var(--red);color:var(--red-ink)}
+.tile .pair{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--blue);color:#fff;font-size:.7rem;font-family:var(--f-en);font-weight:800}
+.plus{align-self:center;color:var(--muted);font-weight:900;font-family:var(--f-en);padding-bottom:18px}
+
+/* options as tiles */
+.opts{display:flex;flex-wrap:wrap;gap:10px}
+.opts.long{display:grid;grid-template-columns:1fr}
+.opt{display:flex;gap:8px;align-items:center;text-align:left;border:2px solid var(--line);background:var(--surface);border-radius:14px;padding:9px 14px;cursor:pointer;font-family:var(--f-en);font-weight:700;font-size:1rem;line-height:1.35;min-height:46px;box-shadow:0 3px 0 var(--shadow);transition:transform .08s}
+.opts:not(.long) .opt{flex:1 1 calc(50% - 10px);min-width:8rem}
+.opt:hover:not([disabled]){border-color:var(--blue);background:var(--blue-soft)}
+.opt:active:not([disabled]){transform:translateY(2px);box-shadow:0 1px 0 var(--shadow)}
+.opt .k{font-family:var(--f-en);font-weight:800;color:var(--muted);flex:0 0 auto;width:1.6em;height:1.6em;border-radius:50%;background:var(--tile);display:grid;place-items:center;font-size:.8rem}
+.opt[disabled]{cursor:default}
+.opt.wrong{border-style:dashed;color:var(--muted);box-shadow:none;text-decoration:line-through}
+.opt.wrong .k{background:var(--yellow-soft);color:var(--yellow-ink)}
+.opt.right{border-color:var(--red);background:var(--red-soft);color:var(--red-ink)}
+.opt.right .k{background:var(--red);color:#fff}
+
+
+/* plain stem */
+.stem{font-family:var(--f-doc);font-size:1.08rem;line-height:1.7}
+.stem em{font-style:italic}
+.gap-line{color:var(--blue-ink);font-weight:600;letter-spacing:.05em}
+/* sentence cutter */
+.cutter{display:flex;flex-wrap:wrap;align-items:center;row-gap:8px;background:var(--surface);border-radius:12px;padding:12px 10px;font-family:var(--f-en);font-weight:700;font-size:1.05rem}
+.cw{padding:2px 2px}
+.cw.blankw{color:var(--blue-ink)}
+.gapb{border:0;background:transparent;cursor:pointer;width:22px;height:34px;display:inline-grid;place-items:center;color:var(--muted);font-weight:900;border-radius:6px;padding:0}
+.gapb:hover{background:var(--blue-soft);color:var(--blue-ink)}
+.gapb.on{color:var(--blue);font-size:1.3rem}
+.cutter.cmp .sp{display:inline-block;width:8px}
+.mark{display:inline-grid;place-items:center;width:20px;height:30px;font-weight:900;font-size:1.2rem;border-radius:6px}
+.mark.hit{color:var(--green-ink)}
+.mark.miss{color:var(--yellow-ink);background:var(--yellow-soft);outline:2px dashed var(--yellow)}
+.mark.extra{color:var(--yellow-ink);font-size:.95rem}
+.legend2{display:flex;flex-wrap:wrap;gap:12px;font-size:.8rem}
+.legend2 .m.hit{color:var(--green-ink)} .legend2 .m.miss{color:var(--yellow-ink)} .legend2 .m.extra{color:var(--yellow-ink)}
+.sub2{font-size:.85rem;font-weight:700;color:var(--yellow-ink)}
+.hinttext{background:var(--surface);border-radius:10px;padding:8px 12px;font-size:.93rem}
+
+
+.steps{margin:0;padding-left:1.3em;display:grid;gap:2px;font-size:.92rem}
+.example{display:flex;flex-wrap:wrap;align-items:center;gap:4px;font-size:.85rem}
+.exlab{font-size:.75rem;font-weight:700;color:var(--yellow-ink);margin-right:4px}
+.example .wv{font-family:var(--f-en);font-weight:700;padding:2px 6px}
+.cutter2{display:flex;flex-wrap:wrap;align-items:center;gap:8px 2px;background:var(--surface);border-radius:12px;padding:12px 10px}
+.grp{display:inline-flex;flex-wrap:wrap;align-items:center;border-radius:12px;padding:3px;border:2px solid var(--blue)}
+.grp.g0{background:var(--blue-soft)}
+.grp.g1{background:var(--surface)}
+.grp:empty{display:none}
+.wbtn{border:0;background:transparent;font-family:var(--f-en);font-weight:700;font-size:1.05rem;padding:6px 7px;border-radius:8px;cursor:pointer;min-height:40px;color:var(--ink)}
+.wbtn:hover:not([disabled]){background:var(--yellow-soft)}
+.wbtn[aria-pressed="true"]{color:var(--blue-ink)}
+.wbtn[disabled]{cursor:default}
+.wbtn.blankw{color:var(--blue-ink)}
+.scis{color:var(--red-ink);font-weight:900;font-size:1.05rem;padding:0 3px}
+
+
+.tags{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.tag.lv{background:var(--blue-soft);color:var(--blue-ink)}
+.say{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 10px;cursor:pointer;font-size:.85rem;display:inline-flex;align-items:center;gap:4px;box-shadow:0 2px 0 var(--shadow);color:var(--blue-ink)}
+.say:hover{border-color:var(--blue)}
+.playbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.rates{display:inline-flex;gap:4px;flex-wrap:wrap}
+.chip{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 10px;font-size:.8rem;cursor:pointer}
+.chip.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.listen-p{background:var(--blue-soft);margin-top:18px}
+.listen-p h4{color:var(--blue-ink)}
+.lines{display:grid;gap:6px}
+.line{display:flex;gap:8px;align-items:flex-start;background:var(--surface);border-radius:10px;padding:8px 10px;border:2px solid transparent}
+.line.on{border-color:var(--yellow);background:var(--yellow-soft)}
+.wwrap{display:grid;gap:6px;justify-items:center}
+.vlist{display:grid;gap:6px;max-height:320px;overflow:auto}
+.vitem{display:flex;gap:8px;align-items:center;background:var(--bg);border-radius:10px;padding:8px 10px;cursor:pointer;font-size:.9rem}
+.linebar{margin-top:12px;background:var(--yellow-soft);color:var(--ink);border-radius:12px;padding:10px 14px;font-size:.9rem}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom, 0px));background:var(--ink);color:var(--bg);border-radius:12px;padding:10px 16px;font-size:.9rem;max-width:calc(100% - 32px);z-index:5}
+.ok-b{color:var(--red-ink)}
+
+/* feedback panels */
+.panel{border-radius:16px;padding:14px;display:grid;gap:10px}
+.panel h4{font-size:.92rem;display:flex;align-items:center;gap:6px;font-weight:900}
+.hint{background:var(--yellow-soft)}
+.hint h4{color:var(--yellow-ink)}
+.core-p{background:var(--red-soft)}
+.core-p h4{color:var(--red-ink)}
+.why{background:var(--green-soft)}
+.why h4{color:var(--green-ink)}
+.explain{display:grid;gap:12px}
+.sub{font-size:.82rem;font-weight:700;color:var(--green-ink)}
+.tryrow{display:grid;gap:6px;background:var(--surface);border-radius:12px;padding:10px 12px}
+.tryrow .because{font-size:.92rem;display:flex;gap:6px;align-items:flex-start}
+.tryrow .because b{color:var(--yellow-ink)}
+.status{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.pill{border-radius:999px;padding:4px 12px;font-weight:900;font-size:.9rem}
+.pill.good{background:var(--red-soft);color:var(--red-ink)}
+.pill.miss{background:var(--tile);color:var(--muted)}
+details.more{border-radius:12px;background:var(--surface);padding:0 12px}
+details.more summary{cursor:pointer;padding:10px 0;font-weight:700;color:var(--green-ink);list-style:none}
+details.more summary::-webkit-details-marker{display:none}
+details.more summary::before{content:"＋ "}
+details.more[open] summary::before{content:"－ "}
+details.more .body{padding-bottom:12px;display:grid;gap:8px;font-size:.93rem}
+.en{font-family:var(--f-en);font-weight:700}
+
+/* connector diagram (transitions) */
+.flow{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:stretch}
+.scard{background:var(--surface);border-radius:12px;padding:10px 12px;font-family:var(--f-en);font-weight:600;font-size:.95rem;display:grid;gap:4px}
+.scard .mood{font-family:var(--f-ui);font-size:.78rem;font-weight:700}
+.mood.up{color:var(--green-ink)} .mood.down{color:var(--yellow-ink)}
+.link{display:grid;place-items:center;gap:2px;text-align:center}
+.link .w{font-family:var(--f-en);font-weight:800;background:var(--red-soft);color:var(--red-ink);border:2px solid var(--red);border-radius:12px;padding:6px 10px}
+.link .r{font-size:.75rem;color:var(--green-ink);font-weight:700}
+@media (max-width:560px){.flow{grid-template-columns:1fr}.link{grid-auto-flow:column;justify-content:start;gap:8px}}
+
+.ruleline{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+
+/* done + word cards */
+.done{margin-top:18px;border-radius:18px;padding:16px;display:grid;gap:4px;background:var(--surface);border:2px solid var(--green);box-shadow:0 3px 0 var(--shadow)}
+.done strong{font-size:1.05rem}
+.small{font-size:.85rem;color:var(--muted)}
+.section-title{margin-top:24px;font-size:1.05rem;font-weight:900}
+.note{background:var(--yellow-soft);color:var(--ink);border-radius:12px;padding:10px 14px;font-size:.9rem;margin-top:8px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:12px}
+.wcard{border:2px solid var(--line);border-radius:16px;background:var(--surface);padding:14px 12px;min-height:118px;cursor:pointer;display:grid;align-content:center;justify-items:center;gap:6px;box-shadow:0 3px 0 var(--shadow);text-align:center}
+.wcard .w{font-family:var(--f-en);font-size:1.2rem;font-weight:800;color:var(--blue-ink)}
+.wcard .c{font-family:var(--f-en);font-size:.85rem;color:var(--muted);font-weight:600}
+.wcard .zh{font-size:1.15rem;font-weight:900;color:var(--red-ink)}
+.wcard.flipped{border-color:var(--red);background:var(--red-soft)}
+
+.rest{margin-top:18px;background:var(--surface);border-radius:18px;padding:30px 20px;text-align:center;display:grid;gap:8px;justify-items:center;box-shadow:0 3px 0 var(--shadow)}
+.book{display:grid;gap:10px;margin-top:12px}
+.bitem{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;background:var(--surface);border-radius:14px;padding:12px 14px;font-size:.9rem;box-shadow:0 2px 0 var(--shadow)}
+.bitem .lab{color:var(--muted)}
+.dialog{margin-top:16px;background:var(--surface);border-radius:16px;padding:16px;display:grid;gap:10px;box-shadow:0 2px 0 var(--shadow)}
+textarea{width:100%;box-sizing:border-box;min-height:90px;border:1.5px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);padding:10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.8rem}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.score{font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion:no-preference){
+  .panel,.done{animation:pop .28s ease-out}
+  .tile.ans .w,.tile.bad .w{animation:drop .3s ease-out}
+  .trimmed .tile{transition:opacity .35s}
+}
+@keyframes pop{from{opacity:.3;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes drop{from{transform:translateY(-8px) scale(.94)}to{transform:none}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="logo" aria-hidden="true"><i style="background:var(--blue)"></i><i style="background:var(--yellow)"></i><i style="background:var(--green)"></i><i style="background:var(--red)"></i></div>
+      <div>
+        <div class="eyebrow">第 1 週・詞性判斷 × 辦公室與會議</div>
+        <h1>多益每日三題</h1>
+      </div>
+    </div>
+    <div class="toolbar">
+      <button class="btn" id="btn-book" type="button">錯題本 <span id="book-count" class="score">0</span></button>
+      <button class="btn" id="btn-voice" type="button">🔊 聲音</button>
+      <button class="btn" id="btn-backup" type="button">備份／還原</button>
+    </div>
+  </header>
+  <div class="legend" aria-label="顏色說明">
+    <span class="lg-b">藍＝要記住的字</span>
+    <span class="lg-y">黃＝看這裡、不合</span>
+    <span class="lg-g">綠＝為什麼</span>
+    <span class="lg-r">紅＝正解與核心</span>
+  </div>
+  <div class="linebar" id="linebar" hidden>你正在 LINE 裡開啟，聲音可能不穩定。建議按右上角「⋯」選「用瀏覽器開啟」。</div>
+  <nav class="days" id="days" aria-label="選擇星期"></nav>
+  <div class="toast" id="toast" role="status" hidden></div>
+  <main id="main"></main>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- icons ---------- */
+var IC = {
+ noun:'<svg class="i" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="4.5" width="11" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M2.5 7.5h11" stroke="currentColor" stroke-width="1.6"/></svg>',
+ verb:'<svg class="i" viewBox="0 0 16 16" aria-hidden="true"><path d="M9 1.5 3.5 9h4L6.5 14.5 12.5 7h-4z" fill="currentColor"/></svg>',
+ adj:'<svg class="i" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 8.5V3h5.5L14 9.5 8.5 15z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="5" cy="6" r="1.2" fill="currentColor"/></svg>',
+ adv:'<svg class="i" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 5h6M1 8h8M2 11h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M10 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+ link:'<svg class="i" viewBox="0 0 16 16" aria-hidden="true"><path d="M6.5 9.5l3-3M7 4.5l1-1a2.8 2.8 0 0 1 4 4l-1 1M9 11.5l-1 1a2.8 2.8 0 0 1-4-4l1-1" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
+ person:'<svg class="i" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="5" r="2.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 14c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
+ eye:'<svg class="i" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 8S4 3.5 8 3.5 14.5 8 14.5 8 12 12.5 8 12.5 1.5 8 1.5 8z" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="8" cy="8" r="2" fill="currentColor"/></svg>',
+ dot:'<svg class="i" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3" fill="currentColor"/></svg>'
+};
+function iconFor(r){
+  if(!r) return "";
+  if(/看這裡/.test(r)) return IC.eye;
+  if(/代名詞|主格|受格|所有格|人/.test(r)) return IC.person;
+  if(/副詞/.test(r)) return IC.adv;
+  if(/形容詞/.test(r)) return IC.adj;
+  if(/動詞/.test(r)) return IC.verb;
+  if(/名詞|主詞|受詞|東西/.test(r)) return IC.noun;
+  if(/修飾|片語|子句|介系詞|連接/.test(r)) return IC.link;
+  return IC.dot;
+}
+
+/* ---------- data: week 1 ---------- */
+var DAYS = [
+ {key:"mon", d:"一", t:"單字", c:"var(--blue)",  title:"單字日＋聽力", sub:"3 題單字、2 題聽力，做完再翻本週單字卡。"},
+ {key:"tue", d:"二", t:"文法", c:"var(--green)", title:"文法日＋聽力", sub:"3 題詞性判斷、2 題聽力。"},
+ {key:"wed", d:"三", t:"句子", c:"var(--red)",   title:"句子日＋聽力", sub:"3 題找主幹與換句話說、2 題聽力。"},
+ {key:"thu", d:"四", t:"短文", c:"var(--yellow)",title:"短文日（Part 6）＋廣播", sub:"先讀完短文作答，再聽 1 段廣播。最後可以把短文再聽一遍。"},
+ {key:"fri", d:"五", t:"閱讀", c:"var(--blue)",  title:"閱讀日（Part 7）", sub:"每題先看題目，再回文章找關鍵字。做完可以把文章再聽一遍。"},
+ {key:"sat", d:"六", t:"錯題", c:"var(--green)", title:"錯題日", sub:"有錯題才練，沒有就休息。"},
+ {key:"sun", d:"日", t:"休息", c:"var(--muted)", title:"休息", sub:"第 3、6、9、12 週的週日改做小模考。"}
+];
+
+var PASSAGES = {
+ thu:'<div class="meta"><span>To: All Staff</span><span>From: Office Manager</span><span>Subject: New Photocopier</span></div>A new photocopier has been installed on the second floor. It is <span class="blank">(1)</span> for printing large documents. <span class="blank">(2)</span>, please do not use it for personal documents. If the machine stops working, please contact <span class="blank">(3)</span> at extension 245.',
+ fri:'<h3>Staff Meeting Rescheduled</h3>The monthly staff meeting, originally scheduled for Wednesday, May 6, at 10:00 A.M., has been moved to Friday, May 8, at 2:00 P.M. in Conference Room B. The agenda will be distributed by e-mail on Thursday. Employees who cannot attend should inform their supervisor in advance. Mr. Park will take the minutes.'
+};
+
+/* chunk: string | {t, r(role), clue, kw, slot, mod, sv, pair} */
+var Q = [
+ {id:"mon1",day:"mon",cat:"vocab",tag:"單字",type:"blank",
+  sent:[{t:"Please",join:1},{slot:1,r:"動詞"},{t:"your expense report",r:"東西"},{t:"to the accounting department",r:"交給誰",clue:1},{t:"by Friday",r:"期限"}],
+  opts:["submit","attend","approve","postpone"],ans:0,
+  role:["交出去","出席","批准","延期"],
+  hint:"報告要「給」某個部門，找「交出去」的動作。",
+  why:{1:"attend 是出席，後面接會議、活動，不能接報告。",2:"approve 是主管批准報告，不是你把報告交給部門。",3:"by Friday 是交件期限，不是要延後。"},
+  rule:[{t:"submit",core:1},"+",{t:"a report / a proposal",kw:1}],ruleNote:"submit＝交出（＝hand in）",
+  more:'名詞是 <span class="en">submission</span>。常見搭配：<span class="en">submit an application</span>（交申請）。'},
+ {id:"mon2",day:"mon",cat:"vocab",tag:"單字",type:"blank",
+  sent:[{t:"All department managers",r:"主詞"},{t:"are expected to",join:1},{slot:1,r:"動詞"},{t:"the meeting",r:"直接接活動",clue:1},"on Thursday."],
+  opts:["attend","participate","arrive","attendance"],ans:0,
+  role:["動詞・直接接","動詞・要加 in","動詞・要加 at","名詞"],
+  hint:"空格和 the meeting 中間沒有任何字，哪個動詞能直接接會議？",
+  why:{1:"participate 一定要加 in：participate in the meeting。",2:"arrive 要加 at，而且意思是抵達，不是出席。",3:"attendance 是名詞，to 後面要接動詞。"},
+  rule:[{t:"attend",core:1},"+",{t:"the meeting",kw:1}],ruleNote:"attend 直接接活動，不加 to／in",
+  more:'<span class="en">participate in</span> = <span class="en">take part in</span> = <span class="en">attend</span>。名詞：<span class="en">attendance</span>（出席）、<span class="en">attendee</span>（出席者）。'},
+ {id:"mon3",day:"mon",cat:"vocab",tag:"單字",type:"blank",
+  sent:[{t:"Ms. Chen",r:"主詞"},{t:"will take the",r:"動詞",join:1},{slot:1,r:"東西"},{t:"during the meeting",r:"開會當下",clue:1},{t:"and send them",r:"複數",clue:1},"to everyone afterward."],
+  opts:["agenda","minutes","memo","proposal"],ans:1,
+  role:["會前議程","會議紀錄","內部通知","提案"],
+  hint:"開會「當下」寫、會後寄出，而且要對得上複數的 them。",
+  why:{0:"agenda 是開會前發的議程，不是開會時記的。",2:"memo 是單數，對不上 them，而且它是通知，不是紀錄。",3:"proposal 是事先準備的提案。"},
+  rule:[{t:"take",core:1},"+",{t:"the minutes",core:1}],ruleNote:"take the minutes＝做會議紀錄（這裡的 minutes 不是分鐘）",
+  more:'<span class="en">agenda</span>（會前議程）→ 開會 → <span class="en">minutes</span>（會議紀錄）。'},
+
+ {id:"tue1",day:"tue",cat:"pos",tag:"詞性判斷",type:"blank",
+  sent:[{t:"The manager",r:"主詞"},{slot:1,r:"副詞"},{t:"explained",r:"動詞",clue:1},{t:"the new budget",r:"受詞"},{t:"at the meeting.",r:"地點"}],
+  opts:["brief","briefly","briefing","briefed"],ans:1,
+  role:["形容詞","副詞","動詞 -ing","動詞過去式"],
+  hint:"這句已經有動詞 explained。空格在形容「怎麼解釋」。",
+  why:{0:"形容詞只能形容名詞（a brief meeting），不能形容動作。",2:"句子已經有動詞 explained，不能再放一個動詞。",3:"句子已經有動詞 explained，不能再放一個動詞。"},
+  rule:[{t:"主詞",r:"名詞"},"+",{t:"副詞 ▢",core:1,r:"-ly"},"+",{t:"動詞",r:"動作"}],ruleNote:"形容動作用副詞，看到 -ly 多半就是副詞",
+  more:'一個句子只能有一個主要動詞。brief（形）→ briefly（副）。'},
+ {id:"tue2",day:"tue",cat:"pos",tag:"詞性判斷",type:"blank",
+  sent:[{t:"All staff",r:"主詞"},{t:"must receive",r:"動詞",clue:1},{slot:1,r:"名詞"},{t:"from their supervisor",r:"從誰"},"before working overtime."],
+  opts:["approve","approval","approved","approving"],ans:1,
+  role:["動詞","名詞","動詞過去式","動詞 -ing"],
+  hint:"receive（收到）後面要接一個「東西」。",
+  why:{0:"approve 是動作，不能被「收到」。",2:"approved 是動詞變化，不是東西。",3:"approving 是動詞變化，不是東西。"},
+  rule:[{t:"動詞",r:"動作"},"+",{t:"名詞 ▢",core:1,r:"東西"}],ruleNote:"動詞後面缺東西，就填名詞",
+  more:'-al 結尾也可能是名詞：<span class="en">approval, proposal, arrival, rental</span>。'},
+ {id:"tue3",day:"tue",cat:"pos",tag:"詞性判斷",type:"blank",
+  sent:[{t:"The revised",r:"形容詞",clue:1,join:1},{slot:1,r:"名詞"},{t:"will be sent",r:"動詞"},{t:"to all team members",r:"給誰"},"tomorrow."],
+  opts:["propose","proposal","proposed","proposing"],ans:1,
+  role:["動詞","名詞","動詞過去式","動詞 -ing"],
+  hint:"The revised ___ 是「被寄出去的東西」，主詞要用什麼詞性？",
+  why:{0:"propose 是動作，不能當主詞。",2:"revised 已經在形容了，空格要是被形容的東西。",3:"revised 已經在形容了，空格要是被形容的東西。"},
+  rule:[{t:"the",r:"冠詞"},"+",{t:"形容詞",r:"形容"},"+",{t:"名詞 ▢",core:1,r:"東西"}],ruleNote:"the＋形容詞後面，接被形容的名詞",
+  more:'-tion、-ment 是常見名詞字尾；-al 大多是形容詞，但 proposal、approval 是名詞。'},
+
+ {id:"wed1",day:"wed",cat:"main",tag:"找主幹",type:"main",
+  sent:[{t:"The memo",r:"主詞",sv:1},{t:"about the new parking rules,",r:"修飾",mod:1},{t:"which was written by the facilities manager,",r:"修飾",mod:1},{t:"was distributed",r:"動詞",sv:1},{t:"to all employees",r:"給誰"},{t:"on Monday.",r:"時間"}],
+  ask:"這句真正的主詞和動詞是？",
+  opts:["The memo … was distributed","the facilities manager … was written","the new parking rules … was distributed","The memo … was written"],ans:0,
+  hint:"先把 which… 和 about… 這兩張字卡拿掉，看看剩下什麼。",
+  why:{1:"兩張都在修飾字卡裡，湊起來不是主幹。",2:"the new parking rules 在 about 修飾裡，只說明 memo 的內容。",3:"was written 在 which 修飾裡，是補充說明，不是主要動作。"},
+  rule:[{t:"主詞",core:1},"+",{t:"修飾（可拿掉）",r:"about / which…"},"+",{t:"動詞",core:1}],ruleNote:"who／which、逗號中間、about／in／of 開頭的字卡都可以先拿掉",
+  more:'拆句三步驟：① 拿掉 who／which 子句 ② 拿掉逗號中間的插入語 ③ 拿掉介系詞片語。'},
+ {id:"wed2",day:"wed",cat:"main",tag:"找主幹",type:"main",
+  sent:[{t:"Employees",r:"主詞",sv:1},{t:"who attend the training session",r:"修飾",mod:1},{t:"will receive",r:"動詞",sv:1},{t:"a certificate.",r:"受詞"}],
+  ask:"這句真正的主詞和動詞是？",
+  opts:["Employees … will receive","Employees … attend","the training session … will receive","a certificate … attend"],ans:0,
+  hint:"who 開頭的字卡在說明「哪一種員工」，先把它拿掉。",
+  why:{1:"attend 在 who 修飾裡，只說明是哪些員工。",2:"拿到證書的是員工，不是課程。",3:"證書不會去上課，主詞和動詞配錯了。"},
+  rule:[{t:"主詞",core:1},"+",{t:"who …",r:"修飾"},"+",{t:"動詞",core:1}],ruleNote:"who 後面的動詞只是在介紹前面的人",
+  more:'看到 who／which／that，先找它的結尾，把整張字卡拿掉。'},
+ {id:"wed3",day:"wed",cat:"para",tag:"換句話說",type:"para",
+  orig:["The meeting",{t:"has been postponed",pair:1},"until next Tuesday."],
+  seg:[{t:"The meeting",r:"主詞"},{t:"has been postponed",r:"動詞",clue:1},{t:"until next Tuesday.",r:"時間"}],
+  ask:"哪一句意思最接近？",
+  opts:["The meeting will take place later than planned.","The meeting was canceled.","The meeting will be held earlier.","The meeting took place last Tuesday."],ans:0,
+  alt:["The meeting will",{t:"take place later than planned",pair:1},"."],
+  hint:"postpone 是什麼意思？會議還會開嗎？",
+  why:{1:"canceled 是取消，延期的會議還是會開。",2:"earlier 是提早，方向相反。",3:"原句是 next Tuesday，不是 last Tuesday。"},
+  rule:[{t:"postpone",core:1},"=",{t:"put off",kw:1},"=",{t:"delay",kw:1},"=",{t:"push back",kw:1}],ruleNote:"正確選項很少照抄原文，會換一種說法",
+  more:'延期（postpone）≠ 取消（cancel／call off）。'},
+
+ {id:"thu1",day:"thu",cat:"pos",tag:"詞性判斷",type:"blank",passage:"thu",label:"空格 (1)",
+  sent:[{t:"It",r:"主詞",join:1},{t:"is",r:"be 動詞",clue:1,join:1},{slot:1,r:"形容詞"},{t:"for printing large documents.",r:"用途"}],
+  opts:["ideal","ideally","idealize","ideals"],ans:0,
+  role:["形容詞","副詞","動詞","名詞（複數）"],
+  hint:"It is ___：空格在說明「它是怎麼樣的」。",
+  why:{1:"副詞不能直接放在 is 後面形容主詞。",2:"is 後面不能直接接原形動詞。",3:"it is ideals（它是理想們）意思不通。"},
+  rule:[{t:"be 動詞",r:"is / are"},"+",{t:"形容詞 ▢",core:1,r:"怎麼樣"}],ruleNote:"be ideal for＝很適合做某件事",
+  more:'be 動詞後面常接形容詞：is ready / is available / is ideal。'},
+ {id:"thu2",day:"thu",cat:"trans",tag:"轉承詞",type:"trans",passage:"thu",label:"空格 (2)",
+  seg:[{t:"It is ideal",r:"優點",clue:1},{t:"for printing large documents.",r:"用途"},{t:"______,",r:"方向？"},{t:"please do not use it",r:"限制",clue:1},{t:"for personal documents.",r:"對象"}],
+  a:{t:"It is ideal for printing large documents.",mood:"up",m:"＋ 優點：很好用"},
+  b:{t:"please do not use it for personal documents.",mood:"down",m:"－ 限制：不能這樣用"},
+  need:"轉折",
+  opts:["However","Therefore","For example","Although"],ans:0,
+  role:["轉折","因果","舉例","連接詞・要接完整句子"],
+  hint:"前一句是優點，後一句是限制。方向一樣，還是相反？",
+  why:{1:"Therefore 是因此，但「好用」不是「不能印私人文件」的原因。",2:"後一句不是在舉例。",3:"Although 後面要接完整句子，不能單獨加逗號放句首。"},
+  rule:[{t:"優點",r:"＋"},"→",{t:"However,",core:1},"→",{t:"限制",r:"－"}],ruleNote:"However＝然而，前後意思轉彎",
+  more:'轉折 <span class="en">however</span>｜因果 <span class="en">therefore</span>｜舉例 <span class="en">for example</span>'},
+ {id:"thu3",day:"thu",cat:"pron",tag:"代名詞",type:"blank",passage:"thu",label:"空格 (3)",
+  sent:[{t:"please",join:1},{t:"contact",r:"動詞",clue:1,join:1},{slot:1,r:"受格"},{t:"at extension 245.",r:"分機"}],
+  opts:["I","me","my","mine"],ans:1,
+  role:["主格","受格","所有格","我的東西"],
+  hint:"contact 後面接「被聯絡的人」，寫信的人（Office Manager）怎麼稱呼自己？",
+  why:{0:"I 只能放在動詞前面當主詞。",2:"my 後面一定要接名詞，例如 my office。",3:"contact mine（聯絡我的東西）意思不通。"},
+  rule:[{t:"動詞",r:"動作"},"+",{t:"me / him / her / us / them",core:1,r:"受格"}],ruleNote:"動詞後面的人，用受格",
+  more:'主格 I／he／she（放動詞前）｜受格 me／him／her（放動詞後）｜所有格 my／his／her（後面接名詞）'},
+
+ {id:"fri1",day:"fri",cat:"p7",tag:"主旨題",type:"p7",passage:"fri",
+  ask:"What is the purpose of the notice?",
+  opts:["To announce a change in a meeting time","To introduce a new employee","To request feedback on an agenda","To cancel a monthly meeting"],ans:0,
+  locate:[{t:"Staff Meeting",kw:1},{t:"Rescheduled",pair:1}],
+  seg:[{t:"The monthly staff meeting,",r:"主詞",clue:1},{t:"originally scheduled for Wednesday, May 6, at 10:00 A.M.,",r:"修飾"},{t:"has been moved",r:"動詞",clue:1},{t:"to Friday, May 8, at 2:00 P.M.",r:"新時間"},{t:"in Conference Room B.",r:"地點"}],
+  alt:["To announce",{t:"a change in a meeting time",pair:1}],
+  hint:"標題 Rescheduled 是什麼意思？",
+  why:{1:"文章沒提到新員工。",2:"文章沒有請大家對議程給意見。",3:"會議是改時間（moved to Friday），不是取消。"},
+  rule:[{t:"主旨題",core:1},"→",{t:"標題",kw:1},"+",{t:"第一句",kw:1}],ruleNote:"主旨題先看標題和第一句",
+  more:'<span class="en">reschedule</span>＝重新安排時間；<span class="en">cancel</span>＝取消。'},
+ {id:"fri2",day:"fri",cat:"p7",tag:"細節題",type:"p7",passage:"fri",
+  ask:"When will employees receive the agenda?",
+  opts:["On Wednesday","On Thursday","On Friday","At the meeting"],ans:1,
+  locate:[{t:"The agenda",kw:1},"will be distributed by e-mail",{t:"on Thursday.",pair:1}],
+  seg:[{t:"The agenda",r:"主詞",clue:1},{t:"will be distributed",r:"動詞"},{t:"by e-mail",r:"方式"},{t:"on Thursday.",r:"時間",clue:1}],
+  alt:[{t:"On Thursday",pair:1}],
+  hint:"回文章找 agenda 這張字卡，看它的那一句。",
+  why:{0:"星期三是原本開會的日子。",2:"星期五是改期後的開會日。",3:"議程會在開會前用 e-mail 寄出。"},
+  rule:[{t:"題目關鍵字",kw:1},"→",{t:"回文章找同一個字",r:"定位"},"→",{t:"只精讀那一句",core:1}],ruleNote:"細節題：用關鍵字定位",
+  more:'Part 7 的題目順序，通常跟文章內容的順序一樣。'},
+ {id:"fri3",day:"fri",cat:"para",tag:"換句話說",type:"p7",passage:"fri",
+  ask:"What should employees who cannot attend do?",
+  opts:["Let their supervisor know beforehand","Send an e-mail to Mr. Park","Reschedule the meeting","Read the minutes on Friday"],ans:0,
+  locate:[{t:"Employees who cannot attend",kw:1},"should",{t:"inform",pair:1},"their supervisor",{t:"in advance.",pair:2}],
+  seg:[{t:"Employees",r:"主詞"},{t:"who cannot attend",r:"修飾",clue:1},{t:"should inform",r:"動詞",clue:1},{t:"their supervisor",r:"受詞"},{t:"in advance.",r:"時間"}],
+  alt:[{t:"Let … know",pair:1},"their supervisor",{t:"beforehand",pair:2}],
+  hint:"找到 cannot attend 那一句，看它要員工做什麼。",
+  why:{1:"Mr. Park 是做會議紀錄的人，文章沒說要寄信給他。",2:"文章沒有要員工自己改時間。",3:"文章沒有這樣寫。"},
+  rule:[{t:"inform",core:1},"=",{t:"let … know",kw:1},"｜",{t:"in advance",core:1},"=",{t:"beforehand",kw:1}],ruleNote:"同樣的意思，換一組字說",
+  more:'這就是 Part 7 最常見的「換句話說」。'}
+];
+
+/* twin questions: same point, new sentence. id = original id + "-t" */
+PASSAGES["thu-t"]='<div class="meta"><span>To: All Employees</span><span>From: IT Manager</span><span>Subject: Software Update</span></div>Our accounting software will be updated this weekend. The new version is <span class="blank">(1)</span> to use. <span class="blank">(2)</span>, some reports may look different at first. If you have any questions, please send <span class="blank">(3)</span> an e-mail.';
+PASSAGES["fri-t"]='<h3>Office Closed for Cleaning</h3>The fourth-floor office will be closed on Saturday, June 13, for carpet cleaning. All employees should take their personal items home by Friday evening. Staff who need to work on Saturday may use the meeting rooms on the second floor. Ms. Rivera will answer any questions.';
+
+var TWINS = [
+ {id:"mon1-t",cat:"vocab",tag:"單字",type:"blank",
+  sent:[{t:"All applicants",r:"主詞"},{t:"must",join:1},{slot:1,r:"動詞"},{t:"their résumés",r:"東西",clue:1},{t:"through the company website.",r:"方式"}],
+  opts:["submit","attend","approve","postpone"],ans:0,
+  role:["交出去","出席","批准","延期"],
+  hint:"應徵者要把履歷「交」給公司，找「交出去」的動作。",
+  why:{1:"attend 是出席，後面接會議、活動，不能接履歷。",2:"approve 是公司批准，不是應徵者對自己的履歷做的事。",3:"句子沒有要延後的意思。"},
+  rule:[{t:"submit",core:1},"+",{t:"a résumé / an application",kw:1}],ruleNote:"submit＝交出（＝hand in）",
+  more:'名詞是 <span class="en">submission</span>。'},
+ {id:"mon2-t",cat:"vocab",tag:"單字",type:"blank",
+  sent:[{t:"More than 200 people",r:"主詞"},{t:"are expected to",join:1},{slot:1,r:"動詞"},{t:"the product launch",r:"直接接活動",clue:1},"next week."],
+  opts:["attend","participate","arrive","attendance"],ans:0,
+  role:["動詞・直接接","動詞・要加 in","動詞・要加 at","名詞"],
+  hint:"空格和 the product launch 中間沒有任何字，哪個動詞能直接接活動？",
+  why:{1:"participate 要加 in：participate in the launch。",2:"arrive 要加 at，意思是抵達。",3:"attendance 是名詞，to 後面要接動詞。"},
+  rule:[{t:"attend",core:1},"+",{t:"the launch / the meeting",kw:1}],ruleNote:"attend 直接接活動，不加 to／in",
+  more:'product launch＝新產品發表會。'},
+ {id:"mon3-t",cat:"vocab",tag:"單字",type:"blank",
+  sent:[{t:"Please read the",join:1},{slot:1,r:"東西"},{t:"that were taken",r:"複數＋take",clue:1},{t:"during last week's meeting.",r:"開會當下",clue:1}],
+  opts:["agenda","minutes","memo","proposal"],ans:1,
+  role:["會前議程","會議紀錄","內部通知","提案"],
+  hint:"開會當下「take」的東西是什麼？were 也告訴你它是複數。",
+  why:{0:"agenda 是會前發的，而且是單數，對不上 were。",2:"memo 是單數，對不上 were，也不是開會時記的。",3:"proposal 是單數，而且是事先準備的。"},
+  rule:[{t:"take",core:1},"+",{t:"the minutes",core:1}],ruleNote:"minutes＝會議紀錄，用複數",
+  more:'會議紀錄是被「take」的：minutes are taken。'},
+
+ {id:"tue1-t",cat:"pos",tag:"詞性判斷",type:"blank",
+  sent:[{t:"The new assistant",r:"主詞"},{slot:1,r:"副詞"},{t:"answered",r:"動詞",clue:1},{t:"all of the customer's questions.",r:"受詞"}],
+  opts:["quick","quickly","quickness","quickened"],ans:1,
+  role:["形容詞","副詞","名詞","動詞過去式"],
+  hint:"句子已經有動詞 answered，空格在形容「怎麼回答」。",
+  why:{0:"形容詞只能形容名詞，不能形容動作。",2:"名詞不能夾在主詞和動詞中間形容動作。",3:"句子已經有動詞 answered，不能再放一個動詞。"},
+  rule:[{t:"主詞",r:"名詞"},"+",{t:"副詞 ▢",core:1,r:"-ly"},"+",{t:"動詞",r:"動作"}],ruleNote:"形容動作用副詞",
+  more:'quick（形）→ quickly（副）→ quickness（名）。'},
+ {id:"tue2-t",cat:"pos",tag:"詞性判斷",type:"blank",
+  sent:[{t:"Visitors",r:"主詞"},{t:"must show",r:"動詞",clue:1},{t:"proper",r:"形容詞",join:1},{slot:1,r:"名詞"},{t:"at the front desk.",r:"地點"}],
+  opts:["identify","identification","identified","identifying"],ans:1,
+  role:["動詞","名詞","動詞過去式","動詞 -ing"],
+  hint:"show（出示）後面要接一個「東西」，proper 是在形容那個東西。",
+  why:{0:"identify 是動作，不能被出示。",2:"identified 是動詞變化，不是東西。",3:"identifying 是動詞變化，不是東西。"},
+  rule:[{t:"動詞",r:"動作"},"+",{t:"形容詞",r:"形容"},"+",{t:"名詞 ▢",core:1,r:"東西"}],ruleNote:"形容詞後面接被形容的名詞",
+  more:'-tion 是最常見的名詞字尾：identification（身分證明）。'},
+ {id:"tue3-t",cat:"pos",tag:"詞性判斷",type:"blank",
+  sent:[{t:"The final",r:"形容詞",clue:1,join:1},{slot:1,r:"名詞"},{t:"on the project",r:"修飾"},{t:"will be announced",r:"動詞"},{t:"on Monday.",r:"時間"}],
+  opts:["decide","decision","decisive","decided"],ans:1,
+  role:["動詞","名詞","形容詞","動詞過去式"],
+  hint:"The final ___ 是「被宣布的東西」，要用什麼詞性？",
+  why:{0:"decide 是動作，不能當主詞。",2:"decisive 是形容詞，final 已經在形容了，空格要是被形容的東西。",3:"decided 是動詞變化，不是東西。"},
+  rule:[{t:"the",r:"冠詞"},"+",{t:"形容詞",r:"形容"},"+",{t:"名詞 ▢",core:1,r:"東西"}],ruleNote:"the＋形容詞後面，接名詞",
+  more:'-sion／-tion 結尾多半是名詞：decision、revision。'},
+
+ {id:"wed1-t",cat:"main",tag:"找主幹",type:"main",
+  sent:[{t:"The report",r:"主詞",sv:1},{t:"on last year's sales,",r:"修飾",mod:1},{t:"which was prepared by Ms. Kim,",r:"修飾",mod:1},{t:"was sent",r:"動詞",sv:1},{t:"to the board",r:"給誰"},{t:"this morning.",r:"時間"}],
+  ask:"這句真正的主詞和動詞是？",
+  opts:["The report … was sent","Ms. Kim … was prepared","last year's sales … was sent","The report … was prepared"],ans:0,
+  hint:"先把 which… 和 on… 這兩張字卡拿掉，看看剩下什麼。",
+  why:{1:"兩張都在修飾字卡裡，湊起來不是主幹。",2:"last year's sales 在 on 修飾裡，只說明報告的內容。",3:"was prepared 在 which 修飾裡，是補充說明。"},
+  rule:[{t:"主詞",core:1},"+",{t:"修飾（可拿掉）",r:"on / which…"},"+",{t:"動詞",core:1}],ruleNote:"which 子句、介系詞片語都可以先拿掉",
+  more:'拆句三步驟：① 拿掉 who／which 子句 ② 拿掉逗號中間的插入語 ③ 拿掉介系詞片語。'},
+ {id:"wed2-t",cat:"main",tag:"找主幹",type:"main",
+  sent:[{t:"Customers",r:"主詞",sv:1},{t:"who sign up before Friday",r:"修飾",mod:1},{t:"will get",r:"動詞",sv:1},{t:"a free gift.",r:"受詞"}],
+  ask:"這句真正的主詞和動詞是？",
+  opts:["Customers … will get","Customers … sign up","Friday … will get","a free gift … sign up"],ans:0,
+  hint:"who 開頭的字卡在說明「哪一種客人」，先把它拿掉。",
+  why:{1:"sign up 在 who 修飾裡，只說明是哪些客人。",2:"Friday 在修飾裡，而且拿到禮物的是客人。",3:"禮物不會報名，主詞和動詞配錯了。"},
+  rule:[{t:"主詞",core:1},"+",{t:"who …",r:"修飾"},"+",{t:"動詞",core:1}],ruleNote:"who 後面的動詞只是在介紹前面的人",
+  more:'sign up＝報名、註冊。'},
+ {id:"wed3-t",cat:"para",tag:"換句話說",type:"para",
+  orig:["The training session",{t:"has been called off.",pair:1}],
+  seg:[{t:"The training session",r:"主詞"},{t:"has been called off.",r:"動詞",clue:1}],
+  ask:"哪一句意思最接近？",
+  opts:["The training session will not take place.","The training session will start later.","The training session has been moved to a bigger room.","The training session has ended early."],ans:0,
+  alt:["The training session",{t:"will not take place.",pair:1}],
+  hint:"call off 是延期還是取消？",
+  why:{1:"start later 是延後，call off 是直接取消。",2:"原句沒提到換教室。",3:"原句沒說課程提早結束。"},
+  rule:[{t:"call off",core:1},"=",{t:"cancel",kw:1},"≠",{t:"postpone",kw:1}],ruleNote:"取消（call off）和延期（postpone）是多益最愛考的一對",
+  more:'延期：postpone / put off / delay｜取消：cancel / call off'},
+
+ {id:"thu1-t",cat:"pos",tag:"詞性判斷",type:"blank",passage:"thu-t",label:"空格 (1)",
+  sent:[{t:"The new version",r:"主詞",join:1},{t:"is",r:"be 動詞",clue:1,join:1},{slot:1,r:"形容詞"},{t:"to use.",r:"做什麼"}],
+  opts:["simple","simply","simplify","simplicity"],ans:0,
+  role:["形容詞","副詞","動詞","名詞"],
+  hint:"is ___：空格在說明「新版本是怎麼樣的」。",
+  why:{1:"副詞不能直接放在 is 後面形容主詞。",2:"is 後面不能直接接原形動詞。",3:"is simplicity to use（是簡單性來使用）意思不通。"},
+  rule:[{t:"be 動詞",r:"is / are"},"+",{t:"形容詞 ▢",core:1,r:"怎麼樣"},"+",{t:"to V",r:"做什麼"}],ruleNote:"be simple / easy to use＝很容易使用",
+  more:'simple（形）→ simply（副）→ simplify（動）→ simplicity（名）'},
+ {id:"thu2-t",cat:"trans",tag:"轉承詞",type:"trans",passage:"thu-t",label:"空格 (2)",
+  seg:[{t:"The new version is simple",r:"優點",clue:1},{t:"to use.",r:"用途"},{t:"______,",r:"方向？"},{t:"some reports may look different",r:"小麻煩",clue:1},{t:"at first.",r:"時間"}],
+  a:{t:"The new version is simple to use.",mood:"up",m:"＋ 優點：好用"},
+  b:{t:"some reports may look different at first.",mood:"down",m:"－ 小麻煩：一開始不習慣"},
+  opts:["However","As a result","For instance","Even though"],ans:0,
+  role:["轉折","因果","舉例","連接詞・要接完整句子"],
+  hint:"前一句是優點，後一句是小麻煩。方向一樣，還是相反？",
+  why:{1:"As a result 是「結果」，但「好用」不會造成報表看起來不一樣。",2:"後一句不是在舉例。",3:"Even though 後面要接完整句子，不能單獨加逗號放句首。"},
+  rule:[{t:"優點",r:"＋"},"→",{t:"However,",core:1},"→",{t:"缺點",r:"－"}],ruleNote:"前後意思轉彎，用 However",
+  more:'因果：as a result, therefore｜舉例：for instance, for example'},
+ {id:"thu3-t",cat:"pron",tag:"代名詞",type:"blank",passage:"thu-t",label:"空格 (3)",
+  sent:[{t:"please",join:1},{t:"send",r:"動詞",clue:1,join:1},{slot:1,r:"受格"},{t:"an e-mail.",r:"東西"}],
+  opts:["I","me","my","mine"],ans:1,
+  role:["主格","受格","所有格","我的東西"],
+  hint:"send 後面先接「寄給誰」，寫信的人（IT Manager）怎麼稱呼自己？",
+  why:{0:"I 只能放在動詞前面當主詞。",2:"my 後面要接名詞，send my an e-mail 不通。",3:"send mine an e-mail（寄給我的東西）意思不通。"},
+  rule:[{t:"send",r:"動詞"},"+",{t:"me",core:1,r:"受格・給誰"},"+",{t:"an e-mail",r:"東西"}],ruleNote:"動詞後面的人，用受格",
+  more:'send me / give him / tell them：動詞後面的人都用受格。'},
+
+ {id:"fri1-t",cat:"p7",tag:"主旨題",type:"p7",passage:"fri-t",
+  ask:"What is the main purpose of the notice?",
+  opts:["To announce that an office will be closed","To introduce a new cleaning company","To ask staff to work on Saturday","To move a meeting to the fourth floor"],ans:0,
+  locate:[{t:"Office Closed",pair:1},{t:"for Cleaning",kw:1}],
+  seg:[{t:"The fourth-floor office",r:"主詞",clue:1},{t:"will be closed",r:"動詞",clue:1},{t:"on Saturday, June 13,",r:"時間"},{t:"for carpet cleaning.",r:"原因"}],
+  alt:["To announce that",{t:"an office will be closed",pair:1}],
+  hint:"標題 Office Closed 是什麼意思？",
+  why:{1:"文章沒介紹清潔公司。",2:"文章沒有要大家週六上班。",3:"文章沒提到要移動會議。"},
+  rule:[{t:"主旨題",core:1},"→",{t:"標題",kw:1},"+",{t:"第一句",kw:1}],ruleNote:"主旨題先看標題和第一句",
+  more:'closed＝關閉；carpet cleaning＝地毯清潔。'},
+ {id:"fri2-t",cat:"p7",tag:"細節題",type:"p7",passage:"fri-t",
+  ask:"By when should employees take their personal items home?",
+  opts:["By Thursday","By Friday evening","By Saturday morning","By Monday"],ans:1,
+  locate:["All employees should take",{t:"their personal items",kw:1},"home",{t:"by Friday evening.",pair:1}],
+  seg:[{t:"All employees",r:"主詞"},{t:"should take",r:"動詞"},{t:"their personal items",r:"東西",clue:1},{t:"home",r:"地方"},{t:"by Friday evening.",r:"期限",clue:1}],
+  alt:[{t:"By Friday evening",pair:1}],
+  hint:"回文章找 personal items 這張字卡，看它的那一句。",
+  why:{0:"文章沒提到星期四。",2:"星期六是辦公室關閉的日子，那時候已經太晚了。",3:"文章沒提到星期一。"},
+  rule:[{t:"題目關鍵字",kw:1},"→",{t:"回文章找同一個字",r:"定位"},"→",{t:"只精讀那一句",core:1}],ruleNote:"細節題：用關鍵字定位",
+  more:'by＋時間＝在這個時間之前。'},
+ {id:"fri3-t",cat:"para",tag:"換句話說",type:"p7",passage:"fri-t",
+  ask:"What can staff who need to work on Saturday do?",
+  opts:["Use rooms on another floor","Work from the fourth floor","Call Ms. Rivera for a key","Clean their own desks"],ans:0,
+  locate:[{t:"Staff who need to work on Saturday",kw:1},{t:"may use the meeting rooms",pair:1},{t:"on the second floor.",pair:2}],
+  seg:[{t:"Staff",r:"主詞"},{t:"who need to work on Saturday",r:"修飾",clue:1},{t:"may use",r:"動詞",clue:1},{t:"the meeting rooms",r:"東西"},{t:"on the second floor.",r:"地點"}],
+  alt:[{t:"Use rooms",pair:1},{t:"on another floor",pair:2}],
+  hint:"找到 work on Saturday 那一句，看它說可以做什麼。",
+  why:{1:"四樓那天關閉，不能在那裡工作。",2:"文章說 Ms. Rivera 回答問題，沒提到鑰匙。",3:"文章沒有要員工自己打掃。"},
+  rule:[{t:"the second floor",core:1},"→",{t:"another floor",kw:1}],ruleNote:"細節換成比較籠統的說法，也是一種換句話說",
+  more:'正確選項常把具體的字（second floor）換成概括的字（another floor）。'}
+];
+function twinOf(id){
+  var want = /-t$/.test(id) ? id.replace(/-t$/,"") : id+"-t";
+  var pool = Q.concat(TWINS);
+  for(var i=0;i<pool.length;i++) if(pool[i].id===want) return pool[i];
+  return null;
+}
+
+/* ---------- listening questions (Part 2 / Part 4) ---------- */
+var LISTEN = [
+ {id:"mon4",hint:"第一個字 When 問的是什麼？答案要是那一類的資訊。",day:"mon",cat:"lis-when",tag:"聽力 Part 2",type:"listen",
+  say:"When does the meeting start?",opts:["In Conference Room B.","At ten o'clock.","Yes, I attended it."],ans:1,
+  seg:[{t:"When",r:"問時間",clue:1},{t:"does the meeting start?",r:"會議開始"}],
+  why:{0:"這是在回答「哪裡」，題目問的是 When（什麼時候）。",2:"When 開頭的問句不能用 Yes／No 回答。"},
+  rule:[{t:"When",core:1},"→",{t:"時間",kw:1}],ruleNote:"先聽清楚第一個字：疑問詞決定答案的類型",
+  more:'When → 時間｜Where → 地點｜Who → 人｜Why → 原因'},
+ {id:"mon5",hint:"Who 問的是人。小心：選項裡重複出現的字不一定是答案。",day:"mon",cat:"lis-who",tag:"聽力 Part 2",type:"listen",
+  say:"Who's taking the minutes today?",opts:["About thirty minutes.","Mr. Park is.","It's on the agenda."],ans:1,
+  seg:[{t:"Who's",r:"問人",clue:1},{t:"taking the minutes",r:"做會議紀錄"},{t:"today?",r:"時間"}],
+  why:{0:"重複出現 minutes，但這裡的 minutes 是「分鐘」，是同字陷阱。",2:"agenda 跟會議有關，但沒有回答「誰」。"},
+  rule:[{t:"Who",core:1},"→",{t:"人",kw:1}],ruleNote:"聽到和題目一樣的字，要特別小心",
+  more:'多益很愛用「同一個字、不同意思」當陷阱：minutes 可以是「分鐘」，也可以是「會議紀錄」。'},
+ {id:"tue4",hint:"Where 問的是地點，交給哪個部門也算地點。",day:"tue",cat:"lis-where",tag:"聽力 Part 2",type:"listen",
+  say:"Where should I submit my expense report?",opts:["To the accounting department.","Last Tuesday.","It was expensive."],ans:0,
+  seg:[{t:"Where",r:"問地點",clue:1},{t:"should I submit",r:"交"},{t:"my expense report?",r:"東西"}],
+  why:{1:"這是在回答「什麼時候」。",2:"expense 和 expensive 發音很像，是音近陷阱。"},
+  rule:[{t:"Where",core:1},"→",{t:"地點／部門",kw:1}],ruleNote:"Where 也可以用「交給哪個部門」來回答",
+  more:'expense（費用）≠ expensive（昂貴的）。'},
+ {id:"tue5",hint:"Why 問的是原因，找 because 開頭的回答。",day:"tue",cat:"lis-why",tag:"聽力 Part 2",type:"listen",
+  say:"Why was the meeting postponed?",opts:["Because the manager is sick.","Next Monday at nine.","In the main office."],ans:0,
+  seg:[{t:"Why",r:"問原因",clue:1},{t:"was the meeting postponed?",r:"會議延期"}],
+  why:{1:"這是在回答「什麼時候」，延期到哪天不是原因。",2:"這是在回答「哪裡」。"},
+  rule:[{t:"Why",core:1},"→",{t:"原因（Because…）",kw:1}],ruleNote:"Why 的答案常用 Because 開頭，也可能直接說原因",
+  more:'postpone＝延期。'},
+ {id:"wed4",hint:"這是在問「要不要我幫你」，該怎麼回應？",day:"wed",cat:"lis-offer",tag:"聽力 Part 2",type:"listen",
+  say:"Would you like me to distribute the handouts?",opts:["Thanks, that would be helpful.","A large distribution center.","I like them too."],ans:0,
+  seg:[{t:"Would you like me to",r:"提議幫忙",clue:1},{t:"distribute",r:"發"},{t:"the handouts?",r:"講義"}],
+  why:{1:"distribution 和 distribute 長得像，是音近陷阱。",2:"重複 like，但意思完全不同。"},
+  rule:[{t:"Would you like me to …?",core:1},"→",{t:"接受／婉拒",kw:1}],ruleNote:"別人提議幫忙，回答是「好啊、謝謝」或「不用了」",
+  more:'Would you like me to…? ＝ 要不要我幫你…？'},
+ {id:"wed5",hint:"不一定要回答 Yes／No，「還沒決定」也是一種回答。",day:"wed",cat:"lis-indirect",tag:"聽力 Part 2",type:"listen",
+  say:"Has the budget been approved yet?",opts:["The board will decide tomorrow.","It's a budget hotel.","Yes, I proved it."],ans:0,
+  seg:[{t:"Has",r:"是非問句",clue:1},{t:"the budget",r:"預算"},{t:"been approved",r:"被批准"},{t:"yet?",r:"了嗎"}],
+  why:{1:"重複 budget，但 budget hotel 是「平價旅館」，同字陷阱。",2:"proved 和 approved 發音很像，是音近陷阱。"},
+  rule:[{t:"Yes／No 問句",core:1},"→",{t:"可以不說 Yes／No",kw:1}],ruleNote:"間接回答：用「明天才決定」表示「還沒」",
+  more:'Part 2 的正解常常不直接說 Yes 或 No，而是拐個彎回答。'},
+ {id:"thu4",hint:"題目問聽眾被要求做什麼，抓 Please 後面那句。",day:"thu",cat:"lis-talk",tag:"聽力 Part 4",type:"talk",
+  say:"Attention, all staff. The elevators in the north building will be closed for repairs on Wednesday morning. Please use the stairs or the elevators in the south building. We apologize for the inconvenience.",
+  ask:"What are listeners asked to do on Wednesday morning?",
+  opts:["Use the stairs or other elevators","Work from home","Repair the elevators","Move to the north building"],ans:0,
+  seg:[{t:"Please use",r:"請求",clue:1},{t:"the stairs",r:"樓梯"},{t:"or the elevators",r:"或電梯"},{t:"in the south building.",r:"地點"}],
+  why:{1:"廣播沒提到在家工作。",2:"電梯由維修人員處理，聽眾不用自己修。",3:"北棟電梯停用，應該去南棟。"},
+  rule:[{t:"Please …",core:1},"→",{t:"聽眾要做的事",kw:1}],ruleNote:"題目問「被要求做什麼」，就專心聽 Please 後面那句",
+  more:'先看題目再聽，知道要找什麼，耳朵就有方向。'}
+];
+var LISTEN_TWINS = [
+ {id:"mon4-t",hint:"When 問的是時間。",cat:"lis-when",tag:"聽力 Part 2",type:"listen",
+  say:"When is the report due?",opts:["By Friday afternoon.","On the top shelf.","Yes, it's very long."],ans:0,
+  seg:[{t:"When",r:"問時間",clue:1},{t:"is the report due?",r:"報告到期"}],
+  why:{1:"這是在回答「哪裡」。",2:"When 開頭的問句不能用 Yes／No 回答。"},
+  rule:[{t:"When",core:1},"→",{t:"時間",kw:1}],ruleNote:"due＝到期、截止",more:'by＋時間＝在…之前。'},
+ {id:"mon5-t",hint:"Who 問的是人；charge 有兩個意思。",cat:"lis-who",tag:"聽力 Part 2",type:"listen",
+  say:"Who is in charge of the new project?",opts:["Ms. Lee is.","There's no charge for delivery.","It's a big project."],ans:0,
+  seg:[{t:"Who",r:"問人",clue:1},{t:"is in charge of",r:"負責"},{t:"the new project?",r:"新案子"}],
+  why:{1:"重複 charge，但這裡是「費用」，同字陷阱。",2:"重複 project，但沒有回答「誰」。"},
+  rule:[{t:"Who",core:1},"→",{t:"人",kw:1}],ruleNote:"in charge of＝負責；no charge＝免費",more:'charge 可以是「負責」，也可以是「費用」。'},
+ {id:"tue4-t",hint:"Where 問的是地點。",cat:"lis-where",tag:"聽力 Part 2",type:"listen",
+  say:"Where is the new photocopier?",opts:["On the second floor.","Ten copies, please.","It was installed yesterday."],ans:0,
+  seg:[{t:"Where",r:"問地點",clue:1},{t:"is the new photocopier?",r:"新影印機"}],
+  why:{1:"copies 和 photocopier 有關，但沒有回答「哪裡」。",2:"這是在回答「什麼時候」。"},
+  rule:[{t:"Where",core:1},"→",{t:"地點",kw:1}],ruleNote:"Where → 地點",more:'photocopier＝影印機。'},
+ {id:"tue5-t",hint:"Why 問的是原因，for 也可以說原因。",cat:"lis-why",tag:"聽力 Part 2",type:"listen",
+  say:"Why is the office closed today?",opts:["For carpet cleaning.","It closes at six.","Please close the door."],ans:0,
+  seg:[{t:"Why",r:"問原因",clue:1},{t:"is the office closed",r:"辦公室關閉"},{t:"today?",r:"時間"}],
+  why:{1:"這是在回答「幾點」，不是原因。",2:"重複 close，但這是請別人關門。"},
+  rule:[{t:"Why",core:1},"→",{t:"原因（for… / because…）",kw:1}],ruleNote:"for＋名詞也可以說原因",more:'For carpet cleaning＝因為要清洗地毯。'},
+ {id:"wed4-t",hint:"這是在請你幫忙，該怎麼回應？",cat:"lis-offer",tag:"聽力 Part 2",type:"listen",
+  say:"Could you send me the agenda?",opts:["Sure, I'll e-mail it now.","The agency is downtown.","I sent a letter."],ans:0,
+  seg:[{t:"Could you",r:"請求",clue:1},{t:"send me",r:"寄給我"},{t:"the agenda?",r:"議程"}],
+  why:{1:"agency 和 agenda 發音很像，是音近陷阱。",2:"重複 send 的過去式，但沒有回應這個請求。"},
+  rule:[{t:"Could you …?",core:1},"→",{t:"答應／拒絕",kw:1}],ruleNote:"請求的回答是 Sure／No problem 或說明做不到",more:'Could you…? ＝ 可以請你…嗎？'},
+ {id:"wed5-t",hint:"不確定的時候，「我查一下」也是好答案。",cat:"lis-indirect",tag:"聽力 Part 2",type:"listen",
+  say:"Is the conference room available this afternoon?",opts:["Let me check the schedule.","Five hundred people attended.","It's a comfortable room."],ans:0,
+  seg:[{t:"Is",r:"是非問句",clue:1},{t:"the conference room",r:"會議室"},{t:"available",r:"有空"},{t:"this afternoon?",r:"時間"}],
+  why:{1:"跟會議有關，但沒有回答會議室有沒有空。",2:"重複 room，但沒有回答有沒有空。"},
+  rule:[{t:"Yes／No 問句",core:1},"→",{t:"「我查一下」也是好答案",kw:1}],ruleNote:"間接回答：Let me check…、I'm not sure…",more:'available＝有空、可以使用。'},
+ {id:"thu4-t",hint:"問原因，就抓 because 後面。",cat:"lis-talk",tag:"聽力 Part 4",type:"talk",
+  say:"Good morning, everyone. Our weekly team meeting will start thirty minutes late today because the manager's flight was delayed. Please use the extra time to finish your sales reports.",
+  ask:"Why will the meeting start late?",
+  opts:["The manager's flight was delayed.","The sales reports are not finished.","The room is being cleaned.","The meeting time was changed last week."],ans:0,
+  seg:[{t:"will start thirty minutes late",r:"晚開始"},{t:"because",r:"原因",clue:1},{t:"the manager's flight",r:"經理的班機"},{t:"was delayed.",r:"延誤",clue:1}],
+  why:{1:"報告是要大家利用多出來的時間完成，不是延後的原因。",2:"廣播沒提到打掃。",3:"廣播說的是今天臨時延後。"},
+  rule:[{t:"Why …?",core:1},"→",{t:"聽 because 後面",kw:1}],ruleNote:"問原因，就抓 because 這張字卡",more:'delayed＝延誤。'}
+];
+Q = Q.concat(LISTEN);
+TWINS = TWINS.concat(LISTEN_TWINS);
+
+/* ---------- speech ---------- */
+var SP = {ok: typeof window!=="undefined" && "speechSynthesis" in window, voices:[], warned:false};
+var PREF_KEY="toeic-voice-v1";
+var pref = (function(){ try{ var s=localStorage.getItem(PREF_KEY); return s?JSON.parse(s):null; }catch(e){ return null; } })() || {rate:0.9, voice:""};
+function savePref(){ try{ localStorage.setItem(PREF_KEY, JSON.stringify(pref)); }catch(e){} }
+function loadVoices(){
+  if(!SP.ok) return;
+  var vs = window.speechSynthesis.getVoices() || [];
+  SP.voices = vs.filter(function(v){ return /^en[-_]/i.test(v.lang) || v.lang==="en"; });
+}
+if(SP.ok){ loadVoices(); if(window.speechSynthesis.addEventListener) window.speechSynthesis.addEventListener("voiceschanged", loadVoices); else window.speechSynthesis.onvoiceschanged = loadVoices; }
+function accentName(lang){
+  var l=(lang||"").toLowerCase().replace("_","-");
+  if(l.indexOf("en-us")===0) return "美國"; if(l.indexOf("en-gb")===0) return "英國";
+  if(l.indexOf("en-au")===0) return "澳洲"; if(l.indexOf("en-ca")===0) return "加拿大";
+  if(l.indexOf("en-in")===0) return "印度"; if(l.indexOf("en-ie")===0) return "愛爾蘭";
+  return "英文";
+}
+function mainVoice(){
+  loadVoices();
+  var v=null;
+  SP.voices.forEach(function(x){ if(x.name===pref.voice) v=x; });
+  if(!v) SP.voices.forEach(function(x){ if(!v && /en[-_]US/i.test(x.lang)) v=x; });
+  return v || SP.voices[0] || null;
+}
+function altVoice(){
+  var m=mainVoice(), v=null;
+  SP.voices.forEach(function(x){ if(!v && m && x.name!==m.name && accentName(x.lang)!==accentName(m.lang)) v=x; });
+  SP.voices.forEach(function(x){ if(!v && m && x.name!==m.name) v=x; });
+  return v || m;
+}
+function splitText(t){
+  var parts = String(t).match(/[^.!?]+[.!?]*\s*/g) || [t], out=[];
+  parts.forEach(function(p){ p=p.trim(); while(p.length>180){ var cut=p.lastIndexOf(" ",180); if(cut<40) cut=180; out.push(p.slice(0,cut)); p=p.slice(cut).trim(); } if(p) out.push(p); });
+  return out;
+}
+/* items: [{text, alt:bool, onstart:fn}] — must be called from a tap */
+function speakSeq(items, done){
+  if(!SP.ok){ toast("這個瀏覽器不支援語音，請改用 Safari 或 Chrome。"); return; }
+  var syn=window.speechSynthesis; syn.cancel();
+  loadVoices();
+  if(!SP.voices.length && !SP.warned){ SP.warned=true; toast("這台裝置找不到英文語音，會用預設聲音念，發音可能不準。"); }
+  var queue=[];
+  items.forEach(function(it){ splitText(it.text).forEach(function(chunk,ci){ queue.push({text:chunk, alt:it.alt, onstart: ci===0?it.onstart:null}); }); });
+  var m=mainVoice(), a=altVoice();
+  queue.forEach(function(it,i){
+    var u=new SpeechSynthesisUtterance(it.text);
+    var v = it.alt ? a : m;
+    if(v){ u.voice=v; u.lang=v.lang; } else u.lang="en-US";
+    u.rate = pref.rate || 0.9;
+    if(it.onstart) u.onstart = it.onstart;
+    if(i===queue.length-1 && done) u.onend = done;
+    syn.speak(u);
+  });
+}
+function speak(text){ speakSeq([{text:text}]); }
+function stopSpeak(){ if(SP.ok) window.speechSynthesis.cancel(); }
+function sayBtn(text,label){
+  var b=el("button","say",'🔊'+(label?' <span>'+label+'</span>':'')); b.type="button";
+  b.setAttribute("aria-label","念出來："+text);
+  b.addEventListener("click",function(e){ e.stopPropagation(); speak(text); });
+  return b;
+}
+var toastTimer=null;
+function toast(msg){
+  var t=document.getElementById("toast"); if(!t) return;
+  t.textContent=msg; t.hidden=false; clearTimeout(toastTimer);
+  toastTimer=setTimeout(function(){ t.hidden=true; },4200);
+}
+function isLine(){ return /\bLine\//i.test(navigator.userAgent||""); }
+
+var WORDS = [["agenda","on the agenda","議程"],["attend","attend a meeting","出席"],["postpone","postpone the meeting","延期"],["minutes","take the minutes","會議紀錄"],["distribute","distribute handouts","分發"],["submit","submit a proposal","提交"],["approve","approve the budget","批准"],["proposal","a revised proposal","提案"]];
+
+/* ---------- storage ---------- */
+var KEY="toeic-w1-v5";
+function load(){ try{ var s=localStorage.getItem(KEY); return s?JSON.parse(s):null; }catch(e){ return null; } }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+var state = load() || {answers:{}, book:[]};
+if(!state.answers) state.answers={}; if(!state.book) state.book=[];
+function pad(n){ return n<10?"0"+n:""+n; }
+function today(){ var d=new Date(); return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
+function addDays(iso,n){ var p=iso.split("-"); var d=new Date(+p[0],+p[1]-1,+p[2]); d.setDate(d.getDate()+n); return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
+function plain(q){ var src=q.sent||q.orig||[]; var s=src.map(function(c){ return typeof c==="string"?c:(c.slot?"___":c.t); }).join(" "); return s||q.say||q.ask||""; }
+function logBook(q,kind){
+  var t=today(), id=q.originId||q.id, ex=null;
+  state.book.forEach(function(b){ if(b.id===id) ex=b; });
+  if(q.originId){ if(ex){ ex.kind="複習又錯"; ex.again=(ex.again||0)+1; ex.fixed=false; } save(); return; }
+  var rv=[addDays(t,1),addDays(t,3),addDays(t,7)];
+  if(ex){ ex.kind=kind; ex.date=t; ex.review=rv; if(ex.fixed){ ex.fixed=false; ex.since=t+"-"+Date.now(); } }
+  else state.book.push({id:id,cat:q.cat,tag:q.tag,kind:kind,date:t,since:t+"-"+Date.now(),review:rv,fixed:false,text:plain(q).slice(0,70),answer:q.opts[q.ans]});
+  save();
+}
+function openBook(){ return state.book.filter(function(b){ return !b.fixed; }); }
+
+/* ---------- tiles ---------- */
+function esc(s){ return String(s).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+function tileHTML(c, o){
+  o=o||{};
+  if(typeof c==="string"){
+    if(c==="+"||c==="="||c==="→"||c==="｜") return '<span class="plus">'+c+'</span>';
+    return '<span class="tile"><span class="w">'+esc(c)+'</span>'+(o.roles?'<span class="r">&nbsp;</span>':'')+'</span>';
+  }
+  var cls=["tile"], text=c.t, role=c.r;
+  if(c.slot){
+    if(o.fill!=null){ cls.push(o.fillClass||"ans"); text=o.fill; role=o.fillRole||c.r; }
+    else { cls.push("slot"); text="？"; role=o.roles?c.r:""; }
+  }
+  if(c.clue && o.clues) { cls.push("clue"); }
+  if(c.kw) cls.push("kw");
+  if(c.core) cls.push("core");
+  if(c.mod) cls.push("mod");
+  if(c.sv) cls.push("sv");
+  var showRole = o.roles || (c.clue && o.clues);
+  var r = "";
+  if(showRole && role){ var lab = (c.clue && o.clues && !o.roles) ? "看這裡" : role; r='<span class="r">'+iconFor(lab)+esc(lab)+'</span>'; }
+  else if(o.roles) r='<span class="r">&nbsp;</span>';
+  var pair = c.pair ? ' <span class="pair">'+c.pair+'</span>' : '';
+  return '<span class="'+cls.join(" ")+'"><span class="w">'+esc(text)+pair+'</span>'+r+'</span>';
+}
+function rowHTML(arr,o){ return '<div class="tiles">'+arr.map(function(c){ return tileHTML(c,o); }).join("")+'</div>'; }
+function ruleHTML(q){ return '<div class="ruleline">'+q.rule.map(function(c){ return tileHTML(c,{roles:false}); }).join("")+'</div>'; }
+
+/* ---------- render ---------- */
+var main=document.getElementById("main"), daysNav=document.getElementById("days");
+var current=["sun","mon","tue","wed","thu","fri","sat"][new Date().getDay()];
+var view="day";
+function el(tag,cls,html){ var e=document.createElement(tag); if(cls) e.className=cls; if(html!=null) e.innerHTML=html; return e; }
+function qsFor(key){ return Q.filter(function(q){ return q.day===key; }); }
+function isDone(id){ var a=state.answers[id]; return !!(a&&a.done); }
+
+function renderNav(){
+  daysNav.innerHTML="";
+  DAYS.forEach(function(d){
+    var qs=qsFor(d.key), ok=qs.length && qs.every(function(q){ return isDone(q.id); });
+    var b=el("button","",'<span class="d">週'+d.d+'</span><span class="t">'+d.t+(ok?' <span class="ok">✔</span>':'')+'</span>');
+    b.type="button"; b.setAttribute("aria-current",(view==="day"&&d.key===current)?"true":"false");
+    b.addEventListener("click",function(){ current=d.key; view="day"; render(); });
+    daysNav.appendChild(b);
+  });
+}
+
+function render(){
+  renderNav();
+  document.getElementById("book-count").textContent=openBook().length;
+  main.innerHTML="";
+  if(view==="book") return renderBook();
+  if(view==="backup") return renderBackup();
+  if(view==="voice") return renderVoice();
+  var d=DAYS.filter(function(x){ return x.key===current; })[0];
+  var qs = current==="sat" ? satQuestions() : qsFor(current);
+  var prog = qs.length ? '<div class="progress" aria-label="今日進度">'+qs.map(function(q){ var a=state.answers[q.key||q.id]; return '<i class="'+(a&&a.done?"on":(a&&a.tries?"half":""))+'"></i>'; }).join("")+'</div>' : "";
+  main.appendChild(el("div","dayhead",'<div class="badge" style="background:'+d.c+'">'+d.d+'</div><div><h2>週'+d.d+'｜'+d.title+'</h2><p>'+d.sub+'</p>'+prog+'</div>'));
+  if(current==="sun") return rest("今天休息","明天見！");
+  if(current==="sat" && !qs.length) return rest("這週沒有錯題，今天休息","平日答錯或按「我是猜的」的題目，週六會換成同考點的新題。");
+  if(PASSAGES[current]) main.appendChild(el("div","passage",PASSAGES[current]));
+  if(current==="sat") main.appendChild(el("p","note","這週有 "+qs.length+" 題要複習。每一題錯題都換成一題「孿生題」：考同一個重點，但句子和情境不一樣。答對了，那筆錯題就會從錯題本移走。"));
+  var list=el("div","qlist"); main.appendChild(list);
+  qs.forEach(function(q,i){ list.appendChild(renderQ(q,i+1)); });
+  var readQs=qs.filter(function(q){ return q.passage && q.type!=="listen" && q.type!=="talk"; });
+  if(current!=="sat" && READBACK[current] && readQs.length && readQs.every(function(q){ return isDone(q.key||q.id); })){ var rb=readbackPanel(current); if(rb) main.appendChild(rb); }
+  if(qs.every(function(q){ return isDone(q.key||q.id); })) renderDone(qs);
+}
+
+function satQuestions(){
+  var out=[];
+  state.book.forEach(function(b){
+    if(b.fixed && b.fixedOn!==today()) return;
+    var t=twinOf(b.id); if(!t) return;
+    var cp={}; for(var k in t) cp[k]=t[k];
+    cp.originId=b.id; cp.key=t.id+"#"+(b.since||b.date);
+    out.push(cp);
+  });
+  return out;
+}
+
+function rest(big,small){ main.appendChild(el("div","rest",'<div class="logo" aria-hidden="true"><i style="background:var(--blue)"></i><i style="background:var(--yellow)"></i><i style="background:var(--green)"></i><i style="background:var(--red)"></i></div><strong>'+big+'</strong><span class="small">'+small+'</span>')); }
+
+function renderDone(qs){
+  var right=qs.filter(function(q){ var a=state.answers[q.key||q.id]; return a.first&&!a.guessed; }).length;
+  main.appendChild(el("div","done",'<strong>今天完成了！</strong><span class="score">一次答對 '+right+' / '+qs.length+' 題</span>'+(right<qs.length?'<span class="small">答錯和猜的題目都記進錯題本了，週六會出同一個考點的新題。</span>':'<span class="small">全對，太強了。</span>')));
+  if(current==="mon") renderWordCards();
+}
+
+function renderWordCards(){
+  main.appendChild(el("h3","section-title","本週單字卡"));
+  main.appendChild(el("p","note","翻面之前，先自己說說看中文意思。看過不等於記住。"));
+  var g=el("div","cards"); main.appendChild(g);
+  WORDS.forEach(function(w){
+    var front='<span class="w">'+w[0]+'</span><span class="c">'+w[1]+'</span>', back='<span class="zh">'+w[2]+'</span><span class="c">'+w[1]+'</span>';
+    var wrap=el("div","wwrap");
+    var c=el("button","wcard",front); c.type="button"; c.setAttribute("aria-pressed","false");
+    c.addEventListener("click",function(){ var f=c.classList.toggle("flipped"); c.innerHTML=f?back:front; c.setAttribute("aria-pressed",f?"true":"false"); });
+    wrap.appendChild(c); wrap.appendChild(sayBtn(w[0]+". "+w[1],"念"));
+    g.appendChild(wrap);
+  });
+}
+
+var L=["A","B","C","D"];
+var LEVELS={1:"約 450–600 分",2:"約 600–700 分",3:"約 700 分以上"};
+var READBACK = {
+ thu:["A new photocopier has been installed on the second floor.","It is ideal for printing large documents.","However, please do not use it for personal documents.","If the machine stops working, please contact me at extension 245."],
+ fri:["Staff Meeting Rescheduled.","The monthly staff meeting, originally scheduled for Wednesday, May 6, at 10:00 A.M., has been moved to Friday, May 8, at 2:00 P.M. in Conference Room B.","The agenda will be distributed by e-mail on Thursday.","Employees who cannot attend should inform their supervisor in advance.","Mr. Park will take the minutes."]
+};
+function readbackPanel(key){
+  var lines=READBACK[key]; if(!lines) return null;
+  var p=el("div","panel listen-p");
+  p.appendChild(el("h4","",'🎧 讀完再聽一遍（選做）'));
+  p.appendChild(el("div","small","剛剛讀懂的文章，現在聽聽看怎麼念。念到哪一句，那一句就會亮起來；聽不清楚的句子可以單獨重聽。"));
+  var list=el("div","lines"); var rows=[];
+  lines.forEach(function(t){
+    var r=el("div","line"); var tx=el("span","en",esc(t)); r.appendChild(sayBtn(t)); r.appendChild(tx); list.appendChild(r); rows.push(r);
+  });
+  var row=el("div","row");
+  var play=el("button","btn primary","▶ 播放全文"); play.type="button";
+  play.addEventListener("click",function(){
+    speakSeq(lines.map(function(t,i){ return {text:t,onstart:function(){ rows.forEach(function(x,j){ x.classList.toggle("on",j===i); }); }}; }),function(){ rows.forEach(function(x){ x.classList.remove("on"); }); });
+  });
+  var stop=el("button","btn","■ 停止"); stop.type="button"; stop.addEventListener("click",function(){ stopSpeak(); rows.forEach(function(x){ x.classList.remove("on"); }); });
+  row.appendChild(play); row.appendChild(stop); row.appendChild(rateChips());
+  p.appendChild(row); p.appendChild(list);
+  return p;
+}
+function rateChips(){
+  var w=el("span","rates");
+  [0.8,0.9,1].forEach(function(r){
+    var b=el("button","chip"+(pref.rate===r?" on":""),r===1?"正常":r+"x"); b.type="button";
+    b.setAttribute("aria-pressed",pref.rate===r?"true":"false");
+    b.addEventListener("click",function(){ pref.rate=r; savePref(); var all=document.querySelectorAll(".rates .chip"); for(var i=0;i<all.length;i++){ var on=all[i].textContent===(r===1?"正常":r+"x"); all[i].classList.toggle("on",on); all[i].setAttribute("aria-pressed",on?"true":"false"); } });
+    w.appendChild(b);
+  });
+  return w;
+}
+function playItems(q){
+  if(q.type==="talk") return [{text:q.say}];
+  var it=[{text:q.say}];
+  q.opts.forEach(function(o,i){ it.push({text:L[i]+". "+o, alt:true}); });
+  return it;
+}
+function renderVoice(){
+  main.appendChild(el("div","dayhead",'<div class="badge" style="background:var(--blue)">🔊</div><div><h2>聲音設定</h2><p>聲音來自這台手機或電腦內建的語音，每台裝置能選的口音不一樣。</p></div>'));
+  var box=el("div","dialog"); main.appendChild(box);
+  if(!SP.ok){ box.appendChild(el("p","","這個瀏覽器不支援語音。請改用 Safari（iPhone）或 Chrome（Android、電腦）開啟。")); return; }
+  loadVoices();
+  box.appendChild(el("div","note","沒有聲音嗎？① iPhone 請把側邊的靜音開關打開成有聲 ② 把音量調大或戴耳機 ③ 從 LINE 打開的話，請按右上角選「用瀏覽器開啟」。"));
+  box.appendChild(el("b","","語速"));
+  box.appendChild(rateChips());
+  box.appendChild(el("b","","主要聲音（題目用這個聲音念，選項會換另一個聲音）"));
+  if(!SP.voices.length){ box.appendChild(el("p","small","這台裝置目前找不到英文語音。可以先按下面的「試聽」，有些手機要先發一次聲音才會載入清單；再不行就請換瀏覽器。")); }
+  var list=el("div","vlist"); box.appendChild(list);
+  var m=mainVoice();
+  SP.voices.forEach(function(v){
+    var r=el("label","vitem",'<input type="radio" name="voice"'+(m&&m.name===v.name?' checked':'')+'> <span><b>'+accentName(v.lang)+'</b>　'+esc(v.name)+' <span class="small">('+esc(v.lang)+')</span></span>');
+    r.querySelector("input").addEventListener("change",function(){ pref.voice=v.name; savePref(); speak("Hello. This is your TOEIC practice voice."); });
+    list.appendChild(r);
+  });
+  var row=el("div","row");
+  var t=el("button","btn primary","▶ 試聽"); t.type="button";
+  t.addEventListener("click",function(){ speakSeq([{text:"When does the meeting start?"},{text:"At ten o'clock.",alt:true}],function(){ render(); }); });
+  row.appendChild(t); box.appendChild(row);
+  var acc={}; SP.voices.forEach(function(v){ acc[accentName(v.lang)]=1; });
+  box.appendChild(el("p","small","這台裝置找得到的口音："+(Object.keys(acc).join("、")||"無")+"。多益會出現美國、英國、加拿大、澳洲四種口音。"));
+}
+
+
+function stemText(q){
+  var src = q.sent || q.orig || [];
+  return src.map(function(c){ return typeof c==="string"?c:(c.slot?"______":c.t); }).join(" ");
+}
+function segChunks(q){
+  if(q.seg) return q.seg;
+  return (q.sent||[]).map(function(c){ if(typeof c==="string") return {t:c}; if(c.slot){ var o={}; for(var k in c) o[k]=c[k]; o.t="______"; return o; } return c; });
+}
+/* words + which gaps are required / optional */
+function segModel(q){
+  var ch=segChunks(q), words=[], req={}, opt={};
+  ch.forEach(function(c,ci){
+    var ws=String(c.t).split(/\s+/).filter(function(x){return x;});
+    ws.forEach(function(w){ words.push(w); });
+    var g=words.length-1;
+    if(ci<ch.length-1){ if(c.join) opt[g]=1; else req[g]=1; }
+  });
+  return {chunks:ch, words:words, req:req, opt:opt};
+}
+
+function renderQ(q,num){
+  var K=q.key||q.id; var a=state.answers[K]||{tries:0,picked:[],done:false,first:false,guessed:false,open:false,trim:false,phase:"",cuts:[]};
+  if(!a.cuts) a.cuts=[];
+  state.answers[K]=a;
+  var box=el("article","q");
+  box.appendChild(el("div","qtop",'<span class="qnum">第 '+num+' 題'+(q.label?'・'+q.label:'')+(q.originId?'・孿生題':'')+'</span><span class="tags"><span class="tag">'+q.tag+'</span><span class="tag lv">'+LEVELS[q.lv||1]+'</span></span>'));
+  if(q.passage && current==="sat") box.appendChild(el("div","passage",PASSAGES[q.passage]));
+
+  /* plain stem — no tiles before the answer */
+  if(q.type==="blank") box.appendChild(el("div","stem",esc(stemText(q)).replace("______",'<span class="gap-line">______</span>')));
+  else if(q.type==="main"||q.type==="para"){ box.appendChild(el("div","stem","<em>"+esc(stemText(q))+"</em>")); box.appendChild(el("div","ask",q.ask)); }
+  else if(q.type==="trans") box.appendChild(el("div","ask","選出放進空格 (2) 的字："));
+  else if(q.type==="listen"||q.type==="talk"){
+    var pb=el("div","playbar");
+    var pl=el("button","btn primary",q.type==="talk"?"▶ 播放廣播":"▶ 播放題目和選項"); pl.type="button";
+    pl.addEventListener("click",function(){ speakSeq(playItems(q)); });
+    pb.appendChild(pl); pb.appendChild(rateChips());
+    box.appendChild(pb);
+    box.appendChild(el("div","ask",q.type==="talk"?"聽完廣播，回答下面的問題：":"聽一句問句和三個回應，選出最適合的回應。題目不會顯示文字，跟真正的考試一樣。"));
+    if(q.type==="talk") box.appendChild(el("div","stem",esc(q.ask)));
+  }
+  else box.appendChild(el("div","stem",esc(q.ask)));
+
+  /* options */
+  var long = q.type!=="blank" && q.type!=="trans" && q.type!=="listen";
+  var locked = a.phase==="seg";
+  var opts=el("div","opts"+(long?" long":""));
+  q.opts.forEach(function(t,i){
+    var hide = q.type==="listen" && !a.done;
+    var b=el("button","opt",'<span class="k">'+L[i]+'</span><span>'+(hide?'選項 '+L[i]:esc(t))+'</span>'); b.type="button";
+    if(a.picked.indexOf(i)>=0 && i!==q.ans){ b.classList.add("wrong"); b.disabled=true; }
+    if(a.done){ b.disabled=true; if(i===q.ans) b.classList.add("right"); }
+    if(locked) b.disabled=true;
+    b.addEventListener("click",function(){ choose(q,i); });
+    opts.appendChild(b);
+  });
+  box.appendChild(opts);
+
+  var fb=el("div","explain"); box.appendChild(fb);
+  if(!a.done && a.tries===1) fb.appendChild(segPanel(q,a));
+  if(a.done){
+    var st=el("div","status");
+    if(a.first && !a.guessed){
+      st.appendChild(el("span","pill good","✔ 答對了"));
+      var g=el("button","btn","我是猜的"); g.type="button";
+      g.addEventListener("click",function(){ a.guessed=true; a.open=true; logBook(q,"猜對"); save(); render(); });
+      st.appendChild(g);
+      if(!a.open){ var s=el("button","btn","看字卡解說"); s.type="button"; s.addEventListener("click",function(){ a.open=true; save(); render(); }); st.appendChild(s); }
+    } else {
+      st.appendChild(el("span","pill miss",a.guessed?"已記進錯題本（猜的也要複習）":"正解是 "+L[q.ans]+"，已記進錯題本"));
+    }
+    fb.appendChild(st);
+    if(a.open || !a.first || a.guessed) explain(q,a,fb);
+  }
+  return box;
+}
+
+/* ---------- step after a wrong answer: cut the sentence into word cards ---------- */
+function segPanel(q,a){
+  var m=segModel(q);
+  var p=el("div","panel hint");
+  if(a.phase==="seg"){
+    p.appendChild(el("h4","",'✂️ 先把句子切成字卡，再選一次'));
+    p.appendChild(el("ol","steps",'<li><b>點一下單字</b>，就會在它<b>後面</b>切一刀 ✂</li><li>同一組的字會圍在同一張卡片裡</li><li>切錯了？再點一次那個字就能取消</li>'));
+    p.appendChild(el("div","example",'<span class="exlab">例子</span><span class="grp g0"><span class="wv">The manager</span></span><span class="scis">✂</span><span class="grp g1"><span class="wv">explained</span></span><span class="scis">✂</span><span class="grp g0"><span class="wv">the new budget</span></span>'));
+    var cutBox=el("div","cutter2"); p.appendChild(cutBox);
+    var cuts=a.cuts.slice().sort(function(x,y){return x-y;});
+    var gi=0, grp=el("span","grp g0");
+    cutBox.appendChild(grp);
+    m.words.forEach(function(w,i){
+      var last = i===m.words.length-1;
+      var on = a.cuts.indexOf(i)>=0;
+      var b=el("button","wbtn"+(w.indexOf("______")===0?" blankw":""),esc(w)); b.type="button";
+      if(last){ b.disabled=true; b.title="最後一個字後面不用切"; }
+      else{
+        b.setAttribute("aria-pressed",on?"true":"false");
+        b.setAttribute("aria-label",w+(on?"，後面已切開，點一下取消":"，點一下在後面切開"));
+        b.addEventListener("click",function(){ var k=a.cuts.indexOf(i); if(k>=0) a.cuts.splice(k,1); else a.cuts.push(i); save(); render(); });
+      }
+      grp.appendChild(b);
+      if(on && !last){
+        cutBox.appendChild(el("span","scis","✂"));
+        gi++; grp=el("span","grp g"+(gi%2)); cutBox.appendChild(grp);
+      }
+    });
+    var row=el("div","row");
+    var chk=el("button","btn primary","檢查斷句"); chk.type="button";
+    chk.addEventListener("click",function(){ a.phase="segdone"; save(); render(); });
+    var clr=el("button","btn","全部清除"); clr.type="button";
+    clr.addEventListener("click",function(){ a.cuts=[]; save(); render(); });
+    row.appendChild(chk); row.appendChild(clr);
+    row.appendChild(el("span","small","目前切成 "+(a.cuts.length+1)+" 張字卡"));
+    p.appendChild(row);
+  } else {
+    /* compare */
+    var reqN=0, hit=0, extra=0;
+    Object.keys(m.req).forEach(function(g){ reqN++; if(a.cuts.indexOf(+g)>=0) hit++; });
+    a.cuts.forEach(function(g){ if(!m.req[g] && !m.opt[g]) extra++; });
+    p.appendChild(el("h4","",'✂️ 斷句對照：你切對了 '+hit+' / '+reqN+' 刀'+(extra?'，多切了 '+extra+' 刀':'')));
+    var cmp=el("div","cutter cmp"); p.appendChild(cmp);
+    m.words.forEach(function(w,i){
+      cmp.appendChild(el("span","cw"+(w.indexOf("______")===0?" blankw":""),esc(w)));
+      if(i<m.words.length-1){
+        var cut=a.cuts.indexOf(i)>=0, need=!!m.req[i], ok=!!m.opt[i];
+        var cls="mark", txt="";
+        if(need&&cut){ cls+=" hit"; txt="｜"; }
+        else if(need){ cls+=" miss"; txt="｜"; }
+        else if(cut&&ok){ cls+=" hit"; txt="｜"; }
+        else if(cut){ cls+=" extra"; txt="✕"; }
+        if(txt) cmp.appendChild(el("span",cls,txt)); else cmp.appendChild(el("span","sp"," "));
+      }
+    });
+    p.appendChild(el("div","legend2",'<span class="m hit">｜切對</span><span class="m miss">｜漏切</span><span class="m extra">✕ 不用切</span>'));
+    p.appendChild(el("div","sub2","正確的字卡分法（黃色是解題關鍵）："));
+    p.appendChild(el("div","",rowHTML(m.chunks,{roles:true,clues:true})));
+    p.appendChild(el("div","small","斷句沒有唯一標準，重點是看出哪幾個字是一組。"));
+    p.appendChild(el("div","hinttext",'💡 '+esc(q.hint)));
+    p.appendChild(el("div","sub2","看完字卡，在上面再選一次答案。"));
+  }
+  return p;
+}
+
+function transHTML(q,solved){
+  var w=el("div","flow");
+  w.innerHTML='<div class="scard"><span class="mood '+q.a.mood+'">'+q.a.m+'</span>'+esc(q.a.t)+'</div>'+
+    '<div class="link"><span class="w">'+(solved?esc(q.opts[q.ans]):"？")+'</span><span class="r">'+(solved?"轉折 ↷":"方向？")+'</span></div>'+
+    '<div class="scard"><span class="mood '+q.b.mood+'">'+q.b.m+'</span>'+esc(q.b.t)+'</div>';
+  return w;
+}
+
+function explain(q,a,fb){
+  /* 1. core rule (red) */
+  var core=el("div","panel core-p",'<h4>❗ 核心：記住這組字卡</h4>');
+  core.appendChild(el("div","",ruleHTML(q)));
+  core.appendChild(el("div","small",esc(q.ruleNote)));
+  fb.appendChild(core);
+
+  /* 2. tile breakdown (green) */
+  var why=el("div","panel why",'<h4>🔍 字卡拆解：為什麼是這個答案</h4>');
+  var full = q.type==="blank" ? stemText(q).replace("______",q.opts[q.ans]) : (q.type==="main"||q.type==="para") ? stemText(q) : (q.type==="trans" ? q.a.t+" "+q.opts[q.ans]+", "+q.b.t : "");
+  if(full){ var sr=el("div","row"); sr.appendChild(sayBtn(full,"聽整句")); why.appendChild(sr); }
+  if(q.type==="listen"||q.type==="talk"){
+    why.appendChild(el("div","sub",q.type==="talk"?"廣播內容：":"題目念的是："));
+    var tr0=el("div","row"); tr0.appendChild(sayBtn(q.say,"再聽一次")); tr0.appendChild(el("span","en",esc(q.say))); why.appendChild(tr0);
+    why.appendChild(el("div","sub",q.type==="talk"?"關鍵句拆成字卡：":"拆成字卡，先抓第一張："));
+    why.appendChild(el("div","",rowHTML(q.seg,{roles:true,clues:true})));
+    why.appendChild(el("div","sub","每個選項："));
+    q.opts.forEach(function(o,k){
+      var r=el("div","tryrow"); var line=el("div","row");
+      if(q.type==="listen") line.appendChild(sayBtn(o));
+      line.appendChild(el("span","en",(k===q.ans?'✔ ':'✕ ')+L[k]+'. '+esc(o)));
+      r.appendChild(line);
+      r.appendChild(el("div","because",k===q.ans?'<b class="ok-b">✔</b><span>這是正確的回應。</span>':'<b>✕</b><span>'+esc(q.why[k])+'</span>'));
+      why.appendChild(r);
+    });
+  } else if(q.type==="blank"){
+    why.appendChild(el("div","sub","正解放進去，每張字卡的角色："));
+    why.appendChild(el("div","",rowHTML(q.sent,{roles:true,fill:q.opts[q.ans],fillClass:"ans",fillRole:q.role[q.ans]})));
+    why.appendChild(el("div","sub","把其他選項放進去試試："));
+    var si=-1; q.sent.forEach(function(c,i){ if(c.slot) si=i; });
+    Object.keys(q.why).forEach(function(k){
+      var mini=[]; if(si>0) mini.push(q.sent[si-1]); mini.push(q.sent[si]); if(si<q.sent.length-1) mini.push(q.sent[si+1]);
+      var tr=el("div","tryrow");
+      tr.appendChild(el("div","",rowHTML(mini,{roles:true,fill:q.opts[k],fillClass:"bad",fillRole:q.role[k]})));
+      tr.appendChild(el("div","because",'<b>✕</b><span>'+esc(q.why[k])+'</span>'));
+      why.appendChild(tr);
+    });
+  } else if(q.type==="main"){
+    why.appendChild(el("div","sub","按下按鈕，把修飾的字卡拿掉："));
+    var holder=el("div",a.trim?"trimmed":"",rowHTML(q.sent,{roles:true}));
+    why.appendChild(holder);
+    var tb=el("button","btn primary",a.trim?"放回修飾字卡":"拿掉修飾字卡"); tb.type="button";
+    tb.addEventListener("click",function(){ a.trim=!a.trim; holder.className=a.trim?"trimmed":""; tb.textContent=a.trim?"放回修飾字卡":"拿掉修飾字卡"; save(); });
+    why.appendChild(el("div","row")).appendChild(tb);
+    why.appendChild(el("div","sub","其他選項錯在哪："));
+    Object.keys(q.why).forEach(function(k){ why.appendChild(el("div","tryrow",'<div class="because"><b>✕</b><span><span class="en">'+esc(q.opts[k])+'</span>：'+esc(q.why[k])+'</span></div>')); });
+  } else if(q.type==="trans"){
+    why.appendChild(el("div","sub","前後兩句的方向："));
+    why.appendChild(transHTML(q,true));
+    why.appendChild(el("div","sub","把其他選項放進去試試："));
+    Object.keys(q.why).forEach(function(k){
+      var tr=el("div","tryrow");
+      tr.appendChild(el("div","",rowHTML([{slot:1}],{roles:true,fill:q.opts[k],fillClass:"bad",fillRole:q.role[k]})));
+      tr.appendChild(el("div","because",'<b>✕</b><span>'+esc(q.why[k])+'</span>'));
+      why.appendChild(tr);
+    });
+  } else {
+    var src = q.locate || q.orig;
+    why.appendChild(el("div","sub",q.locate?"文章裡的這一句：":"原句："));
+    why.appendChild(el("div","",rowHTML(src,{})));
+    why.appendChild(el("div","sub","正確選項（同樣號碼＝同一個意思）："));
+    why.appendChild(el("div","",rowHTML(q.alt.map(function(c){ return typeof c==="string"?c:{t:c.t,pair:c.pair,core:1}; }),{})));
+    why.appendChild(el("div","sub","其他選項錯在哪："));
+    Object.keys(q.why).forEach(function(k){ why.appendChild(el("div","tryrow",'<div class="because"><b>✕</b><span><span class="en">'+esc(q.opts[k])+'</span>：'+esc(q.why[k])+'</span></div>')); });
+  }
+  fb.appendChild(why);
+
+  var d=el("details","more",'<summary>看完整說明</summary><div class="body">'+q.more+'</div>');
+  fb.appendChild(d);
+}
+
+function choose(q,i){
+  var a=state.answers[q.key||q.id]; if(a.done||a.phase==="seg") return;
+  if(i===q.ans){
+    a.done=true; a.first=(a.tries===0); a.phase="";
+    if(!a.first) logBook(q,"答錯");
+    else if(q.originId){ state.book.forEach(function(b){ if(b.id===q.originId){ b.fixed=true; b.fixedOn=today(); } }); }
+  } else {
+    if(a.picked.indexOf(i)<0) a.picked.push(i);
+    a.tries++;
+    if(a.tries===1){ a.phase="seg"; a.cuts=[]; }
+    if(a.tries>=2){ a.done=true; a.first=false; a.phase=""; logBook(q,"答錯"); }
+  }
+  save(); render();
+}
+
+/* ---------- book & backup ---------- */
+function renderBook(){
+  main.appendChild(el("div","dayhead",'<div class="badge" style="background:var(--red)">!</div><div><h2>錯題本</h2><p>答錯和「我是猜的」都會記在這裡。週六答對同考點的新題，就會移走。</p></div>'));
+  var items=openBook();
+  if(!items.length){ main.appendChild(el("p","small","目前沒有錯題。")); return; }
+  var list=el("div","book"); main.appendChild(list);
+  items.forEach(function(b){
+    list.appendChild(el("div","bitem",'<span class="lab">考點</span><span>'+esc(b.tag)+'（'+esc(b.kind)+(b.again?'，孿生題也錯了':'')+'）</span><span class="lab">題目</span><span class="en">'+esc(b.text)+'</span><span class="lab">正解</span><span class="en">'+esc(b.answer)+'</span><span class="lab">複習日</span><span class="score">'+b.review.map(function(x){ return x.slice(5).replace("-","/"); }).join("、")+'</span>'));
+  });
+}
+function renderBackup(){
+  main.appendChild(el("div","dayhead",'<div class="badge" style="background:var(--blue)">↺</div><div><h2>備份／還原</h2><p>換手機或清除瀏覽器資料前，先複製備份碼存起來，之後貼回來就能還原。</p></div>'));
+  var code=""; try{ code=btoa(unescape(encodeURIComponent(JSON.stringify(state)))); }catch(e){}
+  var box=el("div","dialog",'<label for="code-out"><b>你的備份碼</b></label><textarea id="code-out" readonly></textarea><div class="row"><button class="btn primary" type="button" id="copy">複製備份碼</button><span class="small" id="copy-msg" role="status"></span></div><label for="code-in"><b>貼上備份碼還原</b></label><textarea id="code-in" placeholder="把之前複製的備份碼貼在這裡"></textarea><div class="row"><button class="btn" type="button" id="restore">還原</button><span class="small" id="restore-msg" role="status"></span></div>');
+  main.appendChild(box);
+  document.getElementById("code-out").value=code;
+  document.getElementById("copy").addEventListener("click",function(){
+    var msg=document.getElementById("copy-msg"), ta=document.getElementById("code-out");
+    function fb(){ ta.focus(); ta.select(); msg.textContent="已選取，請按複製（Ctrl+C 或長按複製）。"; }
+    if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(code).then(function(){ msg.textContent="已複製"; },fb); else fb();
+  });
+  document.getElementById("restore").addEventListener("click",function(){
+    var msg=document.getElementById("restore-msg");
+    try{ var s=JSON.parse(decodeURIComponent(escape(atob(document.getElementById("code-in").value.trim()))));
+      if(!s||typeof s!=="object"||!s.answers) throw new Error("bad");
+      state={answers:s.answers,book:s.book||[]}; save(); document.getElementById("book-count").textContent=openBook().length;
+      msg.textContent="已還原，回到題目頁就能看到進度。";
+    }catch(e){ msg.textContent="這段備份碼讀不出來，請確認有完整貼上。"; }
+  });
+}
+
+document.getElementById("btn-book").addEventListener("click",function(){ view=view==="book"?"day":"book"; render(); });
+document.getElementById("btn-backup").addEventListener("click",function(){ view=view==="backup"?"day":"backup"; render(); });
+document.getElementById("btn-voice").addEventListener("click",function(){ view=view==="voice"?"day":"voice"; render(); });
+if(isLine()) document.getElementById("linebar").hidden=false;
+render();
+})();
+</script>
+
+</body>
+</html>

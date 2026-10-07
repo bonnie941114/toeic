@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>body{margin:0}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>多益語音測試</title>
+<style>
+/* Single short column; a checklist the friend can screenshot. */
+:root{--bg:#f3f6ff;--surface:#fff;--ink:#1c2333;--muted:#5d687d;--line:#dbe2f2;--blue:#2f66f5;--blue-soft:#e4ecff;--yellow-soft:#fff3cc;--green:#11774a;--red:#c42634;--f:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11151f;--surface:#1a2030;--ink:#e8ecf5;--muted:#a0abc0;--line:#2c3549;--blue:#7c9dff;--blue-soft:#1d2a4c;--yellow-soft:#3a3016;--green:#7ee3b2;--red:#ff9aa3;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#11151f;--surface:#1a2030;--ink:#e8ecf5;--muted:#a0abc0;--line:#2c3549;--blue:#7c9dff;--blue-soft:#1d2a4c;--yellow-soft:#3a3016;--green:#7ee3b2;--red:#ff9aa3;color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--f);font-size:16px;line-height:1.6}
+.wrap{max-width:36rem;margin:0 auto;padding-inline:16px;padding-block:20px 48px;display:grid;gap:14px}
+h1{font-size:1.4rem;margin:0}
+.card{background:var(--surface);border:1.5px solid var(--line);border-radius:16px;padding:14px 16px;display:grid;gap:8px}
+.card h2{font-size:1rem;margin:0}
+.warn{background:var(--yellow-soft)}
+button{font:inherit;color:inherit;cursor:pointer;border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 16px}
+button.primary{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:700}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.v{display:flex;justify-content:space-between;gap:8px;align-items:center;border-top:1px dashed var(--line);padding-top:8px}
+.small{font-size:.85rem;color:var(--muted)}
+.ok{color:var(--green);font-weight:700}.bad{color:var(--red);font-weight:700}
+code{font-size:.8rem;overflow-wrap:anywhere}
+</style>
+<div class="wrap">
+  <h1>多益語音測試</h1>
+  <p class="small">請照順序按按鈕，最後把這一頁截圖傳回來。大約 1 分鐘。</p>
+  <div class="card warn" id="line" hidden><b>你正在 LINE 裡開啟。</b>先在這裡測一次；如果沒有聲音，請按右上角「⋯」→「用瀏覽器開啟」，再測一次。</div>
+  <div class="card">
+    <h2>① 先確認</h2>
+    <div>iPhone：側邊靜音開關要打開成有聲，音量調大，或戴上耳機。</div>
+  </div>
+  <div class="card">
+    <h2>② 按這個按鈕，聽聽看有沒有聲音</h2>
+    <div class="row"><button class="primary" id="play" type="button">▶ 播放一句英文</button><span id="playres" class="small"></span></div>
+    <div class="row">聽到聲音了嗎？<button type="button" id="yes">有</button><button type="button" id="no">沒有</button><span id="ans"></span></div>
+  </div>
+  <div class="card">
+    <h2>③ 這台裝置能用的英文聲音</h2>
+    <div id="sum" class="small">按過 ② 之後清單會更完整。</div>
+    <div id="list"></div>
+  </div>
+  <div class="card">
+    <h2>④ 裝置資訊（截圖時一起帶到）</h2>
+    <code id="ua"></code>
+  </div>
+</div>
+<script>
+(function(){
+  var ok = "speechSynthesis" in window;
+  var ua = navigator.userAgent || "";
+  document.getElementById("ua").textContent = ua + (ok ? "｜支援語音" : "｜不支援語音");
+  if(/\bLine\//i.test(ua)) document.getElementById("line").hidden = false;
+  function acc(l){ l=(l||"").toLowerCase().replace("_","-");
+    if(l.indexOf("en-us")===0) return "美國"; if(l.indexOf("en-gb")===0) return "英國"; if(l.indexOf("en-au")===0) return "澳洲"; if(l.indexOf("en-ca")===0) return "加拿大"; return "其他英文"; }
+  function voices(){ return ok ? window.speechSynthesis.getVoices().filter(function(v){ return /^en/i.test(v.lang); }) : []; }
+  function say(text, v){
+    if(!ok){ document.getElementById("playres").innerHTML='<span class="bad">這個瀏覽器不支援語音</span>'; return; }
+    var s=window.speechSynthesis; s.cancel();
+    var u=new SpeechSynthesisUtterance(text); if(v){ u.voice=v; u.lang=v.lang; } else u.lang="en-US"; u.rate=0.9;
+    u.onstart=function(){ document.getElementById("playres").textContent="播放中…"; };
+    u.onend=function(){ document.getElementById("playres").textContent="播放結束"; draw(); };
+    u.onerror=function(e){ document.getElementById("playres").innerHTML='<span class="bad">發生錯誤：'+(e.error||"未知")+'</span>'; };
+    s.speak(u);
+  }
+  function draw(){
+    var vs=voices(), list=document.getElementById("list"), seen={};
+    list.innerHTML="";
+    vs.forEach(function(v){
+      seen[acc(v.lang)]=1;
+      var r=document.createElement("div"); r.className="v";
+      var t=document.createElement("span"); t.textContent=acc(v.lang)+"｜"+v.name+"（"+v.lang+"）";
+      var b=document.createElement("button"); b.type="button"; b.textContent="試聽";
+      b.addEventListener("click",function(){ say("Hello. Where should I submit my expense report?", v); });
+      r.appendChild(t); r.appendChild(b); list.appendChild(r);
+    });
+    var want=["美國","英國","加拿大","澳洲"];
+    document.getElementById("sum").innerHTML = "共 "+vs.length+" 個英文聲音。多益四種口音："+
+      want.map(function(w){ return seen[w] ? '<span class="ok">'+w+' ✔</span>' : '<span class="bad">'+w+' ✕</span>'; }).join("　");
+  }
+  if(ok){ draw(); if(window.speechSynthesis.addEventListener) window.speechSynthesis.addEventListener("voiceschanged", draw); else window.speechSynthesis.onvoiceschanged=draw; }
+  document.getElementById("play").addEventListener("click",function(){ say("When does the meeting start? At ten o'clock."); });
+  document.getElementById("yes").addEventListener("click",function(){ document.getElementById("ans").innerHTML='<span class="ok">✔ 有聲音</span>'; });
+  document.getElementById("no").addEventListener("click",function(){ document.getElementById("ans").innerHTML='<span class="bad">✕ 沒有聲音</span>'; });
+})();
+</script>
+
+</body>
+</html>
